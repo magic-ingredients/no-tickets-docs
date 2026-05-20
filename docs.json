@@ -1,0 +1,151 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "no-tickets",
+  "description": "Ticketless project management for AI teams — docs, CLI reference, API reference, MCP tools, and integration guides.",
+  "colors": {
+    "primary": "#14b8a6",
+    "light": "#a855f7",
+    "dark": "#0ea5e9"
+  },
+  "favicon": "/images/favicon.svg",
+  "logo": {
+    "light": "/images/logo-light.svg",
+    "dark": "/images/logo-dark.svg",
+    "href": "https://no-tickets.com"
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Docs",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "introduction",
+              "getting-started/install",
+              "getting-started/first-push",
+              "getting-started/dashboard-tour"
+            ]
+          },
+          {
+            "group": "Markdown Format",
+            "pages": [
+              "markdown-format/overview",
+              "markdown-format/epics",
+              "markdown-format/features",
+              "markdown-format/fixes",
+              "markdown-format/frontmatter",
+              "markdown-format/task-syntax"
+            ]
+          },
+          {
+            "group": "Concepts",
+            "pages": [
+              "concepts/overview",
+              "concepts/phases",
+              "concepts/push-origins",
+              "concepts/entitlements",
+              "concepts/roles",
+              "concepts/epics"
+            ]
+          },
+          {
+            "group": "Integration Guides",
+            "pages": [
+              "integration-guides/overview",
+              "integration-guides/github-actions",
+              "integration-guides/generic-ci",
+              "integration-guides/pr-workflows",
+              "integration-guides/agent-sdks"
+            ]
+          },
+          {
+            "group": "Troubleshooting",
+            "pages": [
+              "troubleshooting/overview",
+              "troubleshooting/common-errors"
+            ]
+          },
+          {
+            "group": "FAQ",
+            "pages": [
+              "faq/overview",
+              "faq/pricing",
+              "faq/data-retention",
+              "faq/privacy"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "CLI Reference",
+        "groups": [
+          {
+            "group": "CLI Reference",
+            "pages": ["cli-reference/overview"]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "API Reference",
+            "pages": ["api-reference/overview"]
+          }
+        ]
+      },
+      {
+        "tab": "MCP Tools",
+        "groups": [
+          {
+            "group": "MCP Tools",
+            "pages": ["mcp-tools/overview"]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Marketing site",
+          "href": "https://no-tickets.com",
+          "icon": "globe"
+        },
+        {
+          "anchor": "Dashboard",
+          "href": "https://app.no-tickets.com",
+          "icon": "chart-line"
+        },
+        {
+          "anchor": "GitHub",
+          "href": "https://github.com/magic-ingredients/no-tickets",
+          "icon": "github"
+        }
+      ]
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Marketing",
+        "href": "https://no-tickets.com"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Open dashboard",
+      "href": "https://app.no-tickets.com"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/magic-ingredients/no-tickets",
+      "x": "https://twitter.com/notickets_dev"
+    }
+  },
+  "search": {
+    "prompt": "Search the no-tickets docs"
+  }
+}

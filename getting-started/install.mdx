@@ -1,0 +1,32 @@
+---
+title: "Install the CLI"
+description: "Install the no-tickets binary on macOS, Linux, or Windows."
+---
+
+<Info>
+  Placeholder. The canonical install instructions live in
+  [`no-tickets/docs/install.md`](https://github.com/magic-ingredients/no-tickets/blob/main/docs/install.md)
+  until the sync workflow lands (Task 4 of the documentation-site feature).
+</Info>
+
+## Quick install (macOS / Linux)
+
+```bash
+curl --proto '=https' --tlsv1.2 -LsSf https://get.no-tickets.com | sh
+```
+
+## Quick install (Windows)
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://get.no-tickets.com/installer.ps1 | iex"
+```
+
+## Homebrew
+
+```bash
+brew install magic-ingredients/tap/no-tickets
+```
+
+Full channel-by-channel guidance — Homebrew tap, direct tarball, CI recipes,
+`no-tickets self-update` — will move here from the source repo as the docs
+sync pipeline comes online.

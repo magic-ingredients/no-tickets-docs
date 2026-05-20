@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="36" viewBox="0 0 180 36" fill="none">
+  <defs>
+    <linearGradient id="logo-mark-grad-dark" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#14b8a6"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(2 6)" stroke="url(#logo-mark-grad-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+    <path d="m9.5 14.5 5-5"/>
+  </g>
+  <text x="38" y="24" font-family="ui-sans-serif, system-ui, -apple-system, 'Inter', sans-serif" font-size="18" font-weight="600" fill="#f8fafc">no-tickets</text>
+</svg>

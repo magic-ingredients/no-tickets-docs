@@ -1,0 +1,47 @@
+---
+title: "no-tickets"
+description: "Ticketless project management for AI teams."
+---
+
+<Note>
+  These docs are under active construction during the event-repository architectural reset.
+  The API reference, concepts, and integration guides will land once the
+  `event-repository-foundation` work ships. Bootstrap pages exist now so the
+  navigation tree, brand, and embed surfaces can be reviewed in parallel.
+</Note>
+
+## What is no-tickets?
+
+no-tickets is the observability layer for agentic coding. Specs live as markdown
+in your repo. Agents push events as they work. The dashboard turns that stream
+into a real-time view of what shipped, what's in flight, and what's blocked —
+without anyone touching a ticket.
+
+## How the docs are organised
+
+<CardGroup cols={2}>
+  <Card title="Getting started" icon="rocket" href="/getting-started/install">
+    Install the CLI, push your first event, take the dashboard tour.
+  </Card>
+  <Card title="Markdown format" icon="file-lines" href="/markdown-format/overview">
+    The canonical spec for epics, features, fixes, frontmatter, and tasks.
+  </Card>
+  <Card title="CLI reference" icon="terminal" href="/cli-reference/overview">
+    Every `no-tickets` subcommand, generated from the binary.
+  </Card>
+  <Card title="API reference" icon="code" href="/api-reference/overview">
+    REST endpoints, generated from the server's OpenAPI spec.
+  </Card>
+  <Card title="MCP tools" icon="robot" href="/mcp-tools/overview">
+    Tool list, schemas, example invocations for the MCP server.
+  </Card>
+  <Card title="Integration guides" icon="plug" href="/integration-guides/overview">
+    GitHub Actions, generic CI, PR workflows, agent SDKs.
+  </Card>
+</CardGroup>
+
+## Where to go next
+
+- New to no-tickets? Start at [Install the CLI](/getting-started/install).
+- Building an integration? Jump to [Integration guides](/integration-guides/overview).
+- Looking up a command? Open the [CLI reference](/cli-reference/overview).
