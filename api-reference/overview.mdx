@@ -49,7 +49,9 @@ plan to cut one in the near term.
   `{ "error": "ValidationError" }` (no `details`) on `PATCH`. The asymmetry is
   intentional — `PATCH` requests are sparse and the per-field errors aren't
   always meaningful.
-- **Auth failures (401, 403)**: `{ "error": "<reason>" }`.
+- **Auth failures (401, 403)**: `{ "error": "<reason>" }`. The one exception is
+  `403 EntitlementExceeded`, which adds an `entitlement` field naming the
+  breached limit: `{ "error": "EntitlementExceeded", "entitlement": "projects" }`.
 
 ## Rate limits
 
@@ -63,5 +65,3 @@ documented per-route because they apply to the token, not the endpoint.
 Browse the **Endpoints** section in the sidebar for the full operation list.
 Each page includes request/response shapes pulled directly from the server's
 zod schemas, plus a "Try it" playground that runs against the live API.
-</content>
-</invoke>

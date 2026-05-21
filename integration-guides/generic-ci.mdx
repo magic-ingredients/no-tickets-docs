@@ -141,10 +141,12 @@ Pin `NT_CLI_VERSION` so cache busts when you bump the CLI.
 | `0` | Push succeeded | continue |
 | `1` | Validation failed (malformed frontmatter, invalid task syntax) | fail the build |
 | `2` | Network / auth failure | retry once, then fail |
-| `3` | Entitlement exceeded | warn but don't fail (volume is soft-capped) |
+| `3` | Entitlement exceeded (hard cap — projects, tokens, agent seats) | fail the build |
 
-A `nt push --ci --on-entitlement-exceeded=fail` flag exists if you'd rather
-treat soft-cap warnings as hard failures.
+Soft-cap breaches (push volume) never return a non-zero exit code; the team
+owner gets an email at 80% and 100% of monthly volume and pushes keep going
+through. See [Entitlements](/concepts/entitlements) for the full soft/hard
+split.
 
 ## See also
 
@@ -152,5 +154,3 @@ treat soft-cap warnings as hard failures.
   on GitHub
 - [PR workflows](/integration-guides/pr-workflows)
 - [CLI reference](/cli-reference/overview) — full `nt push` flag list
-</content>
-</invoke>

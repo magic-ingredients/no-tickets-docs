@@ -87,7 +87,7 @@ account):
 |---|---|
 | `/nt assign @maria` | Sets `assignee: maria, assignee_type: human` on the matched feature |
 | `/nt defer task 3` | Sets task 3's status to `deferred` |
-| `/nt block "waiting on stripe"` | Sets phase to a blocked state with a reason |
+| `/nt block task 2 "waiting on stripe"` | Sets task 2's status to `blocked` with the reason recorded in the activity feed |
 
 These are convenience hooks for reviewers; the canonical source remains the
 files in the repo. Slash-command edits ship as commits to the PR's source
@@ -106,5 +106,3 @@ rolls up from all features regardless of which repo owns them.
 - [GitHub Actions](/integration-guides/github-actions) — the integration
   that drives most of this
 - [Concepts → Push origins](/concepts/push-origins) — `origin: ci` rules
-</content>
-</invoke>
