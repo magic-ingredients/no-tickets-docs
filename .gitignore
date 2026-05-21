@@ -13,7 +13,8 @@ npm-debug.log*
 pnpm-debug.log*
 
 # Generated sync artifacts (placeholder paths — wired in Tasks 2-4)
-# api-reference/openapi.json is committed under Pattern B (no-tickets-service
-# pushes it after each openapi-current release publish).
+# Note: api-reference/openapi.json is committed (Pattern B —
+# no-tickets-service pushes it on each release publish), so it is
+# deliberately absent from this list.
 cli-reference/generated/
 mcp-tools/generated/
