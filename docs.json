@@ -97,7 +97,7 @@
           {
             "group": "Endpoints",
             "openapi": {
-              "source": "https://github.com/magic-ingredients/no-tickets-service/releases/download/openapi-current/openapi.json",
+              "source": "api-reference/openapi.json",
               "directory": "api-reference"
             }
           }
