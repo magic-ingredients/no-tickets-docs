@@ -1,6 +1,119 @@
 ---
-title: "task-syntax"
-description: "Markdown format: task-syntax."
+title: "Task syntax"
+description: "How the `## Tasks` section parses — heading shape, status line, and what counts as progress."
 ---
 
-<Info>Placeholder — content lands with the markdown-format-templates feature.</Info>
+Every feature and fix has a `## Tasks` section. The parser walks this
+section to compute per-feature progress (completed / total) that the
+dashboard surfaces as a progress bar. The shape is rigid because the parser
+has to work on prose that humans and LLMs both write.
+
+## The contract
+
+```markdown
+## Tasks
+
+### 1. First task title
+status: not_started
+
+Optional task body — description, files, expected changes, anything.
+
+### 2. Next task
+status: completed
+
+[...]
+```
+
+Three rules:
+
+1. The `## Tasks` heading must be exactly that — `## Tasks`, H2, capital T.
+2. Each task starts with `### N. Title` — H3, digit number followed by a
+   period, then the title.
+3. The next non-blank line must be `status: <value>`. Anything between this
+   `status:` line and the next `### N.` heading is the task body.
+
+Anything outside this shape is invisible to the parser. You can put prose
+before the first `### 1.` heading; that's the "Tasks section preamble" and
+is ignored.
+
+## `status:` values
+
+| Value | Meaning | Counts toward "completed"? |
+|---|---|:---:|
+| `not_started` | Not yet picked up | — |
+| `in_progress` | Active work | — |
+| `completed` | Done | ✓ |
+| `deferred` | Punted to a later release | — |
+| `blocked` | Cannot proceed until external dependency resolves | — |
+
+Anything else is rejected on push.
+
+## Task numbering
+
+Tasks are numbered for readability. The parser tolerates non-sequential
+numbers — `### 1.`, `### 2.`, `### 5.` parses to three tasks — but the CLI's
+`nt fmt` will renumber to be sequential.
+
+Reordering tasks (cut-and-paste a `### 3.` to before `### 2.`) is fine; the
+parser uses heading position, not the literal number, to determine order.
+
+## Task body — optional, conventional sections
+
+The body has no required structure, but a few `**bold:**` patterns are
+treated specially by the CLI's `nt task` subcommands and by some agent
+integrations:
+
+```markdown
+### 3. Wire the callback handler
+status: in_progress
+
+Wire Google's `/auth/callback` endpoint into the existing auth router.
+
+**Files to modify/create:**
+- `src/server/auth/callback.ts`
+- `src/server/auth/callback.test.ts`
+
+**Expected changes:**
+- New route mounted under `/v1/auth/google/callback`
+- Round-trip integration test through the OAuth mock
+
+**Commit reference:** abc1234
+```
+
+| Pattern | Used by | Behaviour |
+|---|---|---|
+| `**Files to modify/create:**` | CLI `nt task files <n>` | Lists the files for a task |
+| `**Expected changes:**` | Agent integrations | Hints the agent on scope |
+| `**Commit reference:**` | tiny-brain | Auto-stamped on a passing commit; do not edit by hand |
+
+These are conventions, not requirements. The parser doesn't error if you
+omit them.
+
+## What "completed total" means on the dashboard
+
+Per-feature progress = (count of tasks with `status: completed`) / (total
+task count, excluding `deferred`).
+
+A feature with `1 completed, 1 in_progress, 1 deferred` shows as **1 / 2** —
+deferred tasks are excluded from the denominator so a punted task doesn't
+drag the bar down.
+
+## Mistakes the parser catches
+
+| Mistake | Result |
+|---|---|
+| `### 1) Title` (paren instead of period) | Heading not recognised — task invisible to parser |
+| `### One. Title` (word instead of digit) | Same — heading not recognised |
+| `status:` on a non-adjacent line | Treated as prose; task counted as `not_started` |
+| Two tasks with the same number | Both parse; numbers don't have to be unique |
+| `## tasks` (lowercase) | Section not recognised — entire task list invisible |
+
+`nt fmt` reports each of these with a fix-up suggestion before pushing.
+
+## See also
+
+- [Markdown format → Features](/markdown-format/features) — the document
+  this section lives in
+- [Markdown format → Fixes](/markdown-format/fixes) — same task shape
+</content>
+</invoke>

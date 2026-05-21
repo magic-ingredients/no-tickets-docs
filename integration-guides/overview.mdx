@@ -1,13 +1,34 @@
 ---
 title: "Integration guides"
-description: "Wire no-tickets into your CI, PR workflow, or agent SDK."
+description: "Wire no-tickets into your CI pipeline, PR workflow, or AI agent."
 ---
 
-<Info>Placeholder — content lands as Task 9 of the documentation-site feature.</Info>
+no-tickets reports the state of the `.notickets/` directory on every push.
+The richest data comes from CI — pushes from your default branch carry the
+commit SHA, the PR number, and the build URL, which is what powers the
+"this feature shipped in `abc1234`" links in the activity feed.
+
+These guides cover the four most common integration shapes.
 
 ## Guides
 
-- [GitHub Actions](/integration-guides/github-actions)
-- [Generic CI](/integration-guides/generic-ci)
-- [PR workflows](/integration-guides/pr-workflows)
-- [Agent SDKs](/integration-guides/agent-sdks)
+- **[GitHub Actions](/integration-guides/github-actions)** — the official
+  GitHub Action; the path of least resistance if you already deploy through
+  GitHub.
+- **[Generic CI](/integration-guides/generic-ci)** — a shell snippet that
+  runs anywhere you can install `nt` (GitLab CI, CircleCI, Jenkins, Buildkite).
+- **[PR workflows](/integration-guides/pr-workflows)** — phase transitions
+  driven by PR lifecycle events.
+- **[Agent SDKs](/integration-guides/agent-sdks)** — Claude Agent SDK +
+  custom agent integration via MCP.
+
+## Where to start
+
+| If you want… | Start here |
+|---|---|
+| The fastest path to a working integration | [GitHub Actions](/integration-guides/github-actions) |
+| To integrate with a non-GitHub CI | [Generic CI](/integration-guides/generic-ci) |
+| Phase transitions tied to PR state | [PR workflows](/integration-guides/pr-workflows) |
+| An LLM agent that edits your `.notickets/` files | [Agent SDKs](/integration-guides/agent-sdks) |
+</content>
+</invoke>

@@ -91,8 +91,15 @@
         "tab": "API Reference",
         "groups": [
           {
-            "group": "API Reference",
+            "group": "Overview",
             "pages": ["api-reference/overview"]
+          },
+          {
+            "group": "Endpoints",
+            "openapi": {
+              "source": "https://github.com/magic-ingredients/no-tickets-service/releases/download/openapi-current/openapi.json",
+              "directory": "api-reference"
+            }
           }
         ]
       },
@@ -147,5 +154,10 @@
   },
   "search": {
     "prompt": "Search the no-tickets docs"
+  },
+  "feedback": {
+    "thumbsRating": true,
+    "suggestEdits": true,
+    "raiseIssue": true
   }
 }

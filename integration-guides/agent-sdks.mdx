@@ -1,6 +1,164 @@
 ---
-title: "agent-sdks"
-description: "Integration guide: agent-sdks."
+title: "Agent SDKs"
+description: "Let LLM agents read and write your .notickets/ spec — Claude Agent SDK, custom MCP clients."
 ---
 
-<Info>Placeholder — content lands with the documentation-site feature.</Info>
+no-tickets is designed for AI-collaborative workflows: an agent picks up a
+feature, edits the markdown, opens a PR, and the dashboard reflects each
+step under its agent identity.
+
+There are two integration paths:
+
+1. **MCP** — preferred. The official `no-tickets-mcp` server exposes tools
+   any MCP client can call (Claude Desktop, Cursor, Zed, custom Claude
+   Agent SDK apps).
+2. **REST API** — for non-MCP environments or for embedding inside an
+   existing agent framework.
+
+## MCP — Claude Desktop / Cursor / Zed
+
+The MCP server ships in the same Rust workspace as the CLI. Install it once
+and point any MCP-aware client at it:
+
+```bash
+# Install (same script as the CLI)
+curl -fsSL https://get.no-tickets.com | sh
+
+# Verify the MCP binary
+no-tickets-mcp --version
+```
+
+### Claude Desktop
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json`
+(macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+
+```json
+{
+  "mcpServers": {
+    "no-tickets": {
+      "command": "no-tickets-mcp",
+      "env": {
+        "NT_PUSH_TOKEN": "your-token-here"
+      }
+    }
+  }
+}
+```
+
+Restart Claude. The tools below appear in the tool palette.
+
+### Cursor / Zed
+
+Both editors use the same `mcpServers` config shape — paste the snippet
+above into the editor's MCP settings.
+
+## Tools exposed by the MCP server
+
+| Tool | Effect |
+|---|---|
+| `nt_list_epics` | List all epics in the current project |
+| `nt_get_epic` | Read an epic's `epic.md` |
+| `nt_list_features` | List features (filterable by epic, phase, status) |
+| `nt_get_feature` | Read a feature file |
+| `nt_create_feature` | Create a new feature in an epic |
+| `nt_update_feature` | Edit frontmatter or task list |
+| `nt_complete_task` | Mark a single task's `status: completed` |
+| `nt_push` | Push the current local state |
+
+The full schema for each tool lives in the
+[MCP tools reference](/mcp-tools/overview).
+
+## Pushes from agents
+
+When an agent calls `nt_push` (or `nt_update_feature`, which pushes on save),
+the push lands with:
+
+```
+origin: mcp
+agent_id: <reads from NT_AGENT_ID, defaults to "anonymous-agent">
+operator_id: <the human who launched the agent, derived from NT_PUSH_TOKEN>
+```
+
+This combination drives the activity feed entry, so "Claude updated feature
+X (run by Maria)" shows the agent and the human together. Set
+`NT_AGENT_ID` per agent if you have multiple agents on the same token —
+otherwise they all blur into the same identity.
+
+## Claude Agent SDK — direct integration
+
+If you're building a custom agent using the
+[Claude Agent SDK](https://docs.claude.com/en/api/agent-sdk), you have two
+choices:
+
+### Option A: subprocess the MCP server (recommended)
+
+```python
+from claude_agent_sdk import Agent
+import anthropic
+
+agent = Agent(
+  model="claude-opus-4-7",
+  mcp_servers={
+    "no-tickets": {
+      "command": "no-tickets-mcp",
+      "env": {"NT_PUSH_TOKEN": NT_PUSH_TOKEN, "NT_AGENT_ID": "my-bot"}
+    }
+  },
+)
+
+response = agent.run(
+  "Read feature 'auth-flow/google-oauth' and mark task 1 as completed if my "
+  "last commit closed it."
+)
+```
+
+This is the same code path Claude Desktop uses — every tool above is
+available with no extra wiring.
+
+### Option B: call the REST API directly
+
+If you can't run a subprocess (e.g. serverless), call the API directly with
+`anthropic.tool_use` blocks that map to no-tickets HTTP routes. See the
+[REST API reference](/api-reference/overview) for the operation list.
+
+This is more code to maintain — you re-implement the validation and delta
+logic the MCP server already handles. Prefer Option A unless your environment
+forbids subprocesses.
+
+## Custom agent frameworks (LangChain, LlamaIndex, etc.)
+
+Any framework that speaks tool-use can wrap the MCP server. The same
+subprocess pattern works:
+
+```python
+from langchain_mcp import MCPClient
+
+client = MCPClient(
+  command="no-tickets-mcp",
+  env={"NT_PUSH_TOKEN": NT_PUSH_TOKEN},
+)
+tools = client.list_tools()    # returns LangChain Tool objects
+```
+
+For frameworks that don't yet have MCP support, the REST API is the fallback.
+
+## Best practices for agent-driven workflows
+
+- **Set `NT_AGENT_ID` per agent.** Helps reviewers track which agent did
+  what in the activity feed.
+- **Pin the no-tickets-mcp version.** Treat it like any other dependency —
+  `no-tickets-mcp@1.4.0`, not bare.
+- **Don't let agents change `phase` arbitrarily.** Phases reflect the PR
+  lifecycle; agents should write task statuses and let the
+  [PR workflow](/integration-guides/pr-workflows) drive phase transitions.
+- **Use the dry-run mode in eval loops.** `nt push --dry-run` validates and
+  prints the delta without sending — cheap for agent evals.
+
+## See also
+
+- [MCP tools reference](/mcp-tools/overview) — full tool schemas
+- [Concepts → Roles](/concepts/roles) — agent identity and team membership
+- [REST API reference](/api-reference/overview) — for non-MCP integrations
+</content>
+</invoke>

@@ -1,6 +1,62 @@
 ---
-title: "push-origins"
-description: "Concept: push-origins."
+title: "Push origins"
+description: "Where a push came from — CLI, CI, MCP, or dashboard — and why the source matters."
 ---
 
-<Warning>Placeholder — to be reframed around the event-store model.</Warning>
+A **push** is the unit of change in no-tickets. Every time the state of your
+`.notickets/` directory differs from what the server last saw, a push reports
+that delta and the server projects it onto your project's feed, board, and
+metrics.
+
+The **origin** of a push is which client sent it. Origin is recorded with
+every push and shown in the activity feed.
+
+## The four origins
+
+| Origin | Sent by | Typical context |
+|---|---|---|
+| `cli` | `nt push` from a developer's machine | Day-to-day editing — a human just updated some feature files locally |
+| `ci` | GitHub Action / generic CI helper running in a pipeline | Authoritative pushes from the default branch after merge |
+| `mcp` | MCP client (Claude Desktop, Cursor, custom agent) | An agent edited the spec on behalf of a human |
+| `dashboard` | Edits made in the web dashboard | Drag-and-drop on the board, inline title edits, status changes |
+
+## Why origin matters
+
+Origin is used for three things:
+
+1. **Conflict resolution.** A `ci` push from the default branch is treated as
+   authoritative — it can overwrite a `cli` push that ran before merge. A
+   `dashboard` push and a `cli` push race symmetrically.
+2. **Auditability.** "Who changed this?" combines the role (human/agent) with
+   the origin (cli/ci/mcp/dashboard) to give a complete trail in the feed.
+3. **Filtering.** The activity feed can be filtered to hide noisy origins —
+   e.g. exclude `dashboard` micro-edits when reviewing a release.
+
+## Origin and authentication
+
+Every origin uses the same push-token auth (`Authorization: Bearer <token>`).
+The server doesn't trust the client's self-reported origin blindly — it
+cross-checks the request shape and user-agent against the claimed origin.
+A push that claims `origin: ci` from a request with no CI environment fields
+is rejected.
+
+## CI is special
+
+`origin: ci` pushes carry extra metadata the other origins don't:
+
+- The commit SHA the push corresponds to
+- The branch name
+- The CI run URL (so the dashboard can deep-link back to the build)
+- The PR number, if the push happened during a PR build
+
+This is what powers the "this feature shipped in commit `abc1234`" links in
+the activity feed.
+
+## See also
+
+- [Phases](/concepts/phases) — origin influences phase transitions (CI pushes
+  from main move work to `done`)
+- [Integration guides → GitHub Actions](/integration-guides/github-actions) —
+  setting up `origin: ci` pushes
+</content>
+</invoke>

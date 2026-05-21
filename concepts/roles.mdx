@@ -1,6 +1,72 @@
 ---
-title: "roles"
-description: "Concept: roles."
+title: "Roles"
+description: "Humans, agents, and what each can do — team membership and per-project assignments."
 ---
 
-<Warning>Placeholder — to be reframed around the event-store model.</Warning>
+A **role** combines two things: *who* a member is (`human` or `agent`) and
+*what they can do* on a team or project (`owner`, `admin`, `member`, `viewer`).
+Both halves matter — assigning a feature to "human Maria" reads differently in
+the dashboard than "agent Claude", even if both have `member` access.
+
+## Member types
+
+| Type | Auth | Typical usage |
+|---|---|---|
+| `human` | OAuth sign-in (Google, GitHub, email) | Normal team members |
+| `agent` | Push token issued from the dashboard | LLM agents, MCP clients, CI bots |
+
+Agents are first-class team members, not API keys grafted on. They appear in
+the people picker, can be assigned to features, and show up in the activity
+feed by name.
+
+## Team-level roles
+
+| Role | Manage billing | Manage members | Edit projects | Read |
+|---|:---:|:---:|:---:|:---:|
+| `owner` | ✓ | ✓ | ✓ | ✓ |
+| `admin` | — | ✓ | ✓ | ✓ |
+| `member` | — | — | ✓ | ✓ |
+| `viewer` | — | — | — | ✓ |
+
+Every team has exactly one `owner`. Ownership transfers but never duplicates.
+
+## Project-level roles
+
+Projects inherit team roles by default — a team `member` is a project `member`
+on every project in that team. You can downgrade per-project: a team `member`
+can be set to `viewer` on a specific project to hide sensitive work.
+
+You can't *upgrade* per-project. A team `viewer` cannot be made a project
+`member`; promote them at the team level instead.
+
+## Assignment vs role
+
+Assigning a feature to someone (`assignee: maria`) is independent of their
+role. A team `member` can be the assignee of a feature; a team `viewer`
+cannot.
+
+```yaml
+assignee: maria
+assignee_type: human   # 'human' or 'agent' — drives avatar + filter
+```
+
+`assignee_type` is required because the assignee picker shows humans and
+agents in separate sections — the dashboard needs to know which list to
+render the entry in. If you write `assignee_type: agent` for a human, the
+person ends up rendered as a robot. Cute, but inaccurate.
+
+## Agent identity
+
+Agents have stable IDs (`agent_id: claude-coder`) so a fleet of identically-
+configured agents can be distinguished. The dashboard treats `claude-coder`
+running on Maria's laptop the same as the one running on Sam's — same agent,
+two operators. The activity feed records both the agent and the human who
+ran it.
+
+## See also
+
+- [Push origins](/concepts/push-origins) — how `cli` / `mcp` / `ci` origin
+  combines with the human/agent role
+- [Entitlements](/concepts/entitlements) — agent seats are an entitlement
+</content>
+</invoke>

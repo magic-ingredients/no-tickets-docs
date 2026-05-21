@@ -1,6 +1,63 @@
 ---
-title: "entitlements"
-description: "Concept: entitlements."
+title: "Entitlements"
+description: "What your plan unlocks — projects, push volume, agent seats, history retention."
 ---
 
-<Warning>Placeholder — to be reframed around the event-store model.</Warning>
+An **entitlement** is something your plan lets you do. The dashboard checks
+entitlements at the boundary (e.g. when you try to add a new project); the
+CLI and integrations never check — they just push, and the server rejects
+with a clear error if a write would breach an entitlement.
+
+Entitlements are per-**team**, not per-user. A team's plan is the source of
+truth.
+
+## The entitlement surface
+
+| Entitlement | Free | Pro | Enterprise |
+|---|---|---|---|
+| Projects | 3 | 25 | unlimited |
+| Push tokens | 1 per project | 10 per project | unlimited |
+| Push volume | 1k / month | 50k / month | unlimited |
+| Activity history | 14 days | 1 year | unlimited |
+| Agent seats | 1 | 10 | unlimited |
+| SSO | — | — | ✓ |
+| Audit log export | — | — | ✓ |
+
+<Note>
+  Pricing and exact limits are confirmed on the [pricing page](/faq/pricing).
+  The table above lists the *shape* of the entitlement surface; the numbers
+  change over time and this docs page may lag the marketing site by a release
+  or two.
+</Note>
+
+## How entitlement checks fire
+
+The two cases are different on purpose:
+
+- **Dashboard** — checks before showing the action. "Add project" is greyed
+  out with a tooltip if you're at the project ceiling. This gives a clean UX.
+- **CLI / CI / MCP** — does not check; pushes proceed and the server returns
+  `403 EntitlementExceeded` with the breached entitlement in the body. This
+  lets integrations stay simple — they don't have to fetch entitlement state
+  before each push.
+
+Both surfaces eventually converge on the same server-side gate; the dashboard
+check is a UX optimisation, not a security boundary.
+
+## Soft vs hard limits
+
+| Type | Behaviour at the limit |
+|---|---|
+| **Soft** (push volume) | We email the team owner at 80% and 100% of monthly volume; pushes keep going through |
+| **Hard** (projects, push tokens, agent seats) | The next attempt to create one is rejected with `403 EntitlementExceeded` |
+
+Push volume is soft because a midnight cron suddenly hitting a hard cap
+breaks workflows for everyone on the team. Project creation is hard because
+it's a deliberate action a human took.
+
+## See also
+
+- [Roles](/concepts/roles) — who on a team can change the plan
+- [FAQ → Pricing](/faq/pricing) — current plans and prices
+</content>
+</invoke>

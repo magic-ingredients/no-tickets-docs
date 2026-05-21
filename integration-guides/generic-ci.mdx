@@ -1,6 +1,156 @@
 ---
-title: "generic-ci"
-description: "Integration guide: generic-ci."
+title: "Generic CI"
+description: "Push .notickets/ state from any CI system using the no-tickets CLI."
 ---
 
-<Info>Placeholder — content lands with the documentation-site feature.</Info>
+If you're not on GitHub Actions, you can integrate no-tickets with three
+lines of shell. The CLI handles validation, delta computation, and the push
+itself; your CI only needs to install it and run `nt push`.
+
+This guide works for **GitLab CI**, **CircleCI**, **Jenkins**, **Buildkite**,
+**Drone**, **Bitbucket Pipelines**, or anything else that runs Linux/macOS
+shells with internet egress.
+
+## Prerequisites
+
+1. A no-tickets project — create one in the [dashboard](https://app.no-tickets.com).
+2. A push token from **Project settings → Tokens**.
+3. The token stored as a CI secret called `NT_PUSH_TOKEN`.
+
+## The three-line snippet
+
+```bash
+curl -fsSL https://get.no-tickets.com | sh         # install the CLI
+export NT_PUSH_TOKEN="$NT_PUSH_TOKEN"               # already in env via CI secret
+nt push --ci                                        # send the delta
+```
+
+`--ci` tells the CLI to mark the push as `origin: ci` and to pull commit
+SHA / branch / PR number / build URL from the CI environment automatically
+(GitLab, CircleCI, Jenkins, Buildkite, and Drone variables are all
+detected). On unknown systems, set the metadata explicitly:
+
+```bash
+nt push --ci \
+  --commit "$CI_COMMIT_SHA" \
+  --branch "$CI_BRANCH" \
+  --build-url "$CI_BUILD_URL"
+```
+
+## Per-system examples
+
+### GitLab CI
+
+```yaml
+# .gitlab-ci.yml
+notickets:
+  stage: deploy
+  image: alpine:latest
+  variables:
+    NT_PUSH_TOKEN: $NT_PUSH_TOKEN
+  before_script:
+    - apk add --no-cache curl bash
+    - curl -fsSL https://get.no-tickets.com | sh
+  script:
+    - nt push --ci
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+```
+
+### CircleCI
+
+```yaml
+# .circleci/config.yml
+version: 2.1
+
+jobs:
+  notickets-push:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run:
+          name: Install nt
+          command: curl -fsSL https://get.no-tickets.com | sh
+      - run:
+          name: Push
+          command: nt push --ci
+
+workflows:
+  notickets:
+    jobs:
+      - notickets-push:
+          context: notickets   # holds NT_PUSH_TOKEN
+```
+
+### Jenkins (Pipeline)
+
+```groovy
+pipeline {
+  agent any
+  environment {
+    NT_PUSH_TOKEN = credentials('notickets-push-token')
+  }
+  stages {
+    stage('no-tickets push') {
+      steps {
+        sh 'curl -fsSL https://get.no-tickets.com | sh'
+        sh 'nt push --ci'
+      }
+    }
+  }
+}
+```
+
+### Buildkite
+
+```yaml
+# .buildkite/pipeline.yml
+steps:
+  - label: ":notebook: no-tickets push"
+    command: |
+      curl -fsSL https://get.no-tickets.com | sh
+      nt push --ci
+    env:
+      NT_PUSH_TOKEN: ${NT_PUSH_TOKEN}
+```
+
+## Caching the CLI install
+
+The install script is a single static binary, so it's small (~6 MB). On
+systems with build caches you can speed up CI by caching `~/.local/bin/nt`
+between runs:
+
+```yaml
+# CircleCI example
+- restore_cache:
+    keys: [nt-binary-{{ .Environment.NT_CLI_VERSION }}]
+- run: test -x ~/.local/bin/nt || curl -fsSL https://get.no-tickets.com | sh
+- save_cache:
+    key: nt-binary-{{ .Environment.NT_CLI_VERSION }}
+    paths: [~/.local/bin/nt]
+```
+
+Pin `NT_CLI_VERSION` so cache busts when you bump the CLI.
+
+## Exit codes
+
+| Code | Meaning | Recommended CI behaviour |
+|---|---|---|
+| `0` | Push succeeded | continue |
+| `1` | Validation failed (malformed frontmatter, invalid task syntax) | fail the build |
+| `2` | Network / auth failure | retry once, then fail |
+| `3` | Entitlement exceeded | warn but don't fail (volume is soft-capped) |
+
+A `nt push --ci --on-entitlement-exceeded=fail` flag exists if you'd rather
+treat soft-cap warnings as hard failures.
+
+## See also
+
+- [GitHub Actions](/integration-guides/github-actions) — preferred if you're
+  on GitHub
+- [PR workflows](/integration-guides/pr-workflows)
+- [CLI reference](/cli-reference/overview) — full `nt push` flag list
+</content>
+</invoke>

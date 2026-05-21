@@ -1,11 +1,67 @@
 ---
 title: "REST API reference"
-description: "OpenAPI-generated reference for every public no-tickets route."
+description: "Programmatic access to no-tickets — push specs, read activity, manage projects."
 ---
 
-<Info>
-  Placeholder. The API reference is rendered from `dist/openapi.json` published
-  by `no-tickets-service` on each release (Tasks 2 + 3 of the documentation-site
-  feature). It will not be accurate until the event-repository foundation lands —
-  this section is intentionally not linked from the marketing site yet.
-</Info>
+The no-tickets REST API is how the CLI, dashboard, and integrations talk to
+`no-tickets-service`. Everything you can do in the dashboard you can do with the
+API.
+
+<Warning>
+  This reference is auto-generated from the live server's OpenAPI spec. The set
+  of routes currently registered is intentionally narrow while the event-store
+  reset lands — see the [sequencing
+  note](https://github.com/magic-ingredients/no-tickets-service/blob/main/docs/prd/no-tickets-team-dashboard/features/documentation-site.md#sequencing-blocked-on-the-architectural-reset)
+  for context. Routes on the `FLUX` allow-list are documented in code today and
+  surface here as their schemas stabilise.
+</Warning>
+
+## Authentication
+
+| Auth mode | Used by | Header |
+|---|---|---|
+| **Session** | Dashboard SPA | Cookie (set by the OAuth login flow) |
+| **Bearer** | CLI, CI integrations, MCP server | `Authorization: Bearer <push token>` |
+| **None** | Public health + waitlist signup | — |
+
+Push tokens are issued per project from the dashboard. Treat them like
+credentials — anyone holding a push token can write to that project's feed.
+
+## Base URL
+
+```
+https://api.no-tickets.com
+```
+
+The CLI defaults to this; override with `NT_API_URL` for self-hosted or staging
+environments.
+
+## Versioning
+
+Every route lives under `/v1/`. The version increments only on breaking
+changes; additive field changes ship within `v1`. There is no `v2` today and no
+plan to cut one in the near term.
+
+## Response envelopes
+
+- **Success**: the resource shape directly (no wrapping envelope).
+- **Validation failures (422)**: `{ "error": "ValidationError", "details": [...] }` on `POST`,
+  `{ "error": "ValidationError" }` (no `details`) on `PATCH`. The asymmetry is
+  intentional — `PATCH` requests are sparse and the per-field errors aren't
+  always meaningful.
+- **Auth failures (401, 403)**: `{ "error": "<reason>" }`.
+
+## Rate limits
+
+Per-token limits apply to write routes (`POST`, `PATCH`, `DELETE`). The default
+ceiling is 60 req/min — high enough that normal CI usage never hits it, low
+enough that a misconfigured loop won't melt the server. Limits are not
+documented per-route because they apply to the token, not the endpoint.
+
+## What's next
+
+Browse the **Endpoints** section in the sidebar for the full operation list.
+Each page includes request/response shapes pulled directly from the server's
+zod schemas, plus a "Try it" playground that runs against the live API.
+</content>
+</invoke>

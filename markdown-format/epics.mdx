@@ -1,6 +1,92 @@
 ---
-title: "epics"
-description: "Markdown format: epics."
+title: "Epics"
+description: "Epic file format — frontmatter and section structure."
 ---
 
-<Info>Placeholder — content lands with the markdown-format-templates feature.</Info>
+An **epic** is the top-level grouping of work. Every epic lives in its own
+directory under `.notickets/`, and contains exactly one `epic.md` file.
+
+```
+.notickets/
+└── auth-flow/
+    └── epic.md          ← this is what we're documenting
+```
+
+## Required structure
+
+```markdown
+---
+id: auth-flow
+type: epic
+title: Authentication Flow
+status: not_started
+created: 2026-05-20
+updated: 2026-05-20
+---
+
+# Authentication Flow
+
+## Goals
+
+Why we're doing this work and what success looks like.
+
+- Replace the placeholder password auth with OAuth
+- Support Google, GitHub, and email-link sign-in
+- Cut the average login time below 3 seconds
+
+## Features
+
+Features that make up this epic. Each one lives in a sibling .md file.
+
+### Feature 1: Google OAuth
+**File**: [google-oauth.md](google-oauth.md)
+**Status**: in_progress
+**Description**: Wire Google's OAuth 2.0 flow into the login route.
+
+### Feature 2: Token refresh
+**File**: [token-refresh.md](token-refresh.md)
+**Status**: not_started
+**Description**: Background renewal of access tokens before expiry.
+```
+
+## Required fields
+
+| Field | Type | Notes |
+|---|---|---|
+| `id` | kebab-case string | Must match the directory name |
+| `type` | `epic` | Literal |
+| `title` | string | Human-readable; shown on the board |
+| `status` | enum | `not_started` \| `in_progress` \| `completed` |
+| `created` | YYYY-MM-DD | Epic creation date |
+| `updated` | YYYY-MM-DD | Last meaningful update |
+
+See [Frontmatter](/markdown-format/frontmatter) for the full reference.
+
+## Optional sections
+
+The CLI's `nt new epic` template includes a few sections that are useful but
+not parsed:
+
+- `## Target Audience` — who benefits
+- `## Release Criteria` — gate for declaring the epic done
+- `## Success Metrics` — how you'll measure it landed
+- `## Constraints and Dependencies` — what could derail it
+
+These render in the dashboard's epic detail view but don't drive any
+projection. Write them for humans.
+
+## What epics don't have
+
+- **No `phase`** — epics don't have a phase; the dashboard rolls it up from
+  the features and fixes inside.
+- **No `assignee`** — epics aren't assigned. Features and fixes are.
+- **No `## Tasks`** — task lists belong on features and fixes. If you find
+  yourself wanting tasks on an epic, you're describing a feature.
+
+## See also
+
+- [Concepts → Epics](/concepts/epics) — what an epic is, conceptually
+- [Markdown format → Features](/markdown-format/features)
+- [Markdown format → Fixes](/markdown-format/fixes)
+</content>
+</invoke>

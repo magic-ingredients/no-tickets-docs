@@ -1,6 +1,75 @@
 ---
-title: "phases"
-description: "Concept: phases."
+title: "Phases"
+description: "The five-state lifecycle every feature and fix moves through: ideation, development, testing, review, done."
 ---
 
-<Warning>Placeholder — to be reframed around the event-store model.</Warning>
+A **phase** is where a piece of work sits in its lifecycle. Every feature and
+fix has exactly one phase at a time. The phase set is fixed — five values, no
+custom phases per team. That constraint is deliberate: the board looks the
+same across every project, and integrations don't have to translate between
+team-specific vocabulary.
+
+## The five phases
+
+| Phase | What it means | Typical signal that triggers entry |
+|---|---|---|
+| `ideation` | The work is described but no code has been written. | New feature/fix file committed; PRD or task list exists. |
+| `development` | Code is being written. | First implementation commit; PR opened in draft. |
+| `testing` | Implementation is complete; verifying it works. | PR moves out of draft; CI runs; manual QA. |
+| `review` | Awaiting human or agent approval to merge. | PR has "ready for review" state. |
+| `done` | Merged and shipped. | PR merged to default branch. |
+
+## The state machine
+
+```
+   ┌──────────┐    ┌─────────────┐    ┌─────────┐    ┌────────┐    ┌──────┐
+   │ ideation │───►│ development │───►│ testing │───►│ review │───►│ done │
+   └──────────┘    └─────────────┘    └─────────┘    └────────┘    └──────┘
+        ▲                ▲                 │              │
+        │                └─────────────────┘              │
+        │                                                 │
+        └─────────────────────────────────────────────────┘
+                  (rework — kicks back to development)
+```
+
+Phases are intended to move forward. They can move backward when work needs
+rework — for example, a `review` that surfaces a missed test case moves the
+feature back to `development`. Backward transitions are normal; the dashboard
+doesn't treat them as failures.
+
+## How phase is set
+
+You don't write `phase: testing` by hand in most workflows. The phase is
+inferred from signals in your repository:
+
+- The integration (GitHub Action, generic CI helper, MCP push) reports
+  PR/commit state on each push.
+- Frontmatter on the feature/fix file can override the inferred phase when
+  the integration is wrong (e.g. work-in-progress that isn't yet in a PR).
+
+The explicit frontmatter override always wins.
+
+## Phase vs status
+
+Phases are orthogonal to **status** (`not_started`, `in_progress`,
+`completed`). Status answers "are we doing this work?"; phase answers "where
+is it in its lifecycle?". A feature in `phase: testing` is necessarily
+`status: in_progress` — but a feature in `phase: ideation` might still be
+`not_started` if nobody's picked it up.
+
+## Phase rollup on epics
+
+Epics don't have a phase of their own. The dashboard rolls up the phases of
+the features and fixes inside the epic and shows a distribution — "8 in
+development, 3 in review, 2 done". This is intentional: an epic with mixed
+phases is healthy and normal; collapsing that to a single epic phase would
+lose information.
+
+## See also
+
+- [Push origins](/concepts/push-origins) — what triggers a phase transition
+- [Epics](/concepts/epics) — phase rollup behaviour
+- [Markdown format → frontmatter](/markdown-format/frontmatter) — the `phase`
+  field reference
+</content>
+</invoke>

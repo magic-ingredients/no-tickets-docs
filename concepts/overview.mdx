@@ -1,19 +1,40 @@
 ---
 title: "Concepts"
-description: "The mental model behind no-tickets."
+description: "The mental model behind no-tickets — phases, push origins, entitlements, roles, epics."
 ---
 
-<Warning>
-  Concept pages are scoped to the **event-store model** (events, subjects,
-  projections, interactions) that lands with the event-repository foundation.
-  The current copy in this section describes the legacy `schema_*` model and
-  will be rewritten — do not link to these pages from external content.
-</Warning>
+no-tickets describes work in three nouns — **epics**, **features**, and
+**fixes** — and one verb: **push**. Everything else in the product (the
+dashboard board, the activity feed, billing, agent assignment) is a view onto
+those four primitives.
 
-## Topics
+This section is the canonical definition for each term. If a word appears in
+the dashboard, the CLI, an error message, or a marketing page, its meaning is
+fixed here.
 
-- [Phases](/concepts/phases)
-- [Push origins](/concepts/push-origins)
-- [Entitlements](/concepts/entitlements)
-- [Roles](/concepts/roles)
-- [Epics](/concepts/epics)
+## Pages
+
+- **[Phases](/concepts/phases)** — the five-state machine work moves through:
+  ideation → development → testing → review → done.
+- **[Push origins](/concepts/push-origins)** — what changed in a project and
+  where the change came from (CLI, CI, MCP, dashboard).
+- **[Entitlements](/concepts/entitlements)** — what your plan unlocks and how
+  feature gating works.
+- **[Roles](/concepts/roles)** — humans, agents, and what each can do.
+- **[Epics](/concepts/epics)** — grouping work across multiple features and
+  fixes.
+
+## How these fit together
+
+```
+Epic ────────► Feature ─────► Tasks ──► Pushes ──► Activity feed
+   │              │                                       ▲
+   │              └─► Fix ───► Tasks ────────────────────┘
+   └─► Phase (rolled up from features)
+```
+
+A push is the unit of change; an epic is the unit of intent; phases tell you
+where the intent is in its lifecycle. Roles and entitlements answer "who can
+do this?" and "is it included in your plan?"
+</content>
+</invoke>

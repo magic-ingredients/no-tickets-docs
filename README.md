@@ -76,7 +76,6 @@ integration-guides/    # GitHub Actions, generic CI, PR, agent SDKs
 concepts/              # Phases, push origins, entitlements, roles, epics
 troubleshooting/       # Common errors
 faq/                   # Pricing, data retention, privacy
-snippets/              # Reusable MDX fragments
 ```
 
 ## Editing guidelines

@@ -1,6 +1,138 @@
 ---
-title: "features"
-description: "Markdown format: features."
+title: "Features"
+description: "Feature file format — frontmatter, sections, and the task list contract."
 ---
 
-<Info>Placeholder — content lands with the markdown-format-templates feature.</Info>
+A **feature** is a shippable unit of functionality within an epic. Features
+live next to their epic's `epic.md`:
+
+```
+.notickets/
+└── auth-flow/
+    ├── epic.md
+    └── google-oauth.md    ← this is what we're documenting
+```
+
+## Required structure
+
+```markdown
+---
+id: google-oauth
+type: feature
+epic: auth-flow
+title: Google OAuth sign-in
+phase: ideation
+status: not_started
+created: 2026-05-20
+updated: 2026-05-20
+---
+
+# Google OAuth sign-in
+
+## Description
+
+Wire Google's OAuth 2.0 flow into the login route. Replaces the
+placeholder email/password form that ships today.
+
+## Acceptance Criteria
+
+- [ ] User can click "Sign in with Google" on /login
+- [ ] Successful sign-in lands on /dashboard
+- [ ] Failed sign-in returns to /login with an inline error
+
+## Tasks
+
+### 1. Add Google OAuth client to provider registry
+status: not_started
+
+Register a Google OAuth client and surface it from the providers list.
+
+**Files to modify/create:**
+- `src/server/auth/providers.ts`
+
+**Expected changes:**
+- New `googleProvider` exported alongside the existing providers
+- Provider list endpoint returns Google in the array
+
+### 2. Wire the callback handler
+status: not_started
+
+[...]
+```
+
+## Required fields
+
+| Field | Type | Notes |
+|---|---|---|
+| `id` | kebab-case string | Must match the filename (without `.md`) |
+| `type` | `feature` | Literal |
+| `epic` | kebab-case string | Parent epic ID — the directory name |
+| `title` | string | Shown on the board |
+| `phase` | enum | `ideation` \| `development` \| `testing` \| `review` \| `done` |
+| `status` | enum | `not_started` \| `in_progress` \| `completed` |
+| `created` | YYYY-MM-DD | Feature creation date |
+| `updated` | YYYY-MM-DD | Last meaningful update |
+
+## Optional fields
+
+| Field | Type | Notes |
+|---|---|---|
+| `assignee` | string | Member name or agent ID |
+| `assignee_type` | `human` \| `agent` | Drives avatar + filter — see [Roles](/concepts/roles) |
+| `meta` | object | Tool-specific data (e.g. tiny-brain quality scores) |
+
+See [Frontmatter](/markdown-format/frontmatter) for the full reference.
+
+## Required sections
+
+The parser doesn't enforce sections beyond `## Tasks`, but the standard
+template includes the following so the dashboard can render a useful feature
+page:
+
+| Section | Purpose |
+|---|---|
+| `## Description` | What this feature does and why |
+| `## Acceptance Criteria` | Checkboxes the dashboard surfaces as a progress bar |
+| `## Tasks` | Numbered task list with `status:` lines — **parsed** for progress |
+
+## The `## Tasks` contract
+
+Tasks use a fixed shape that the parser walks:
+
+```markdown
+### 1. Task title
+status: not_started
+
+Optional description prose.
+
+**Files to modify/create:**
+- `path/to/file.ts`
+
+**Expected changes:**
+- Change 1
+```
+
+Rules:
+
+- Each task is a `### N. Title` heading at H3.
+- The next non-blank line must be `status: <value>`.
+- Anything between this task and the next `### N.` heading is the task body.
+
+Full task syntax reference: [Task syntax](/markdown-format/task-syntax).
+
+## Worked example
+
+A complete feature file is in the no-tickets [examples
+repo](https://github.com/magic-ingredients/no-tickets-examples) — `auth-flow/google-oauth.md`.
+The CLI's `nt new feature` command also emits the canonical template
+locally.
+
+## See also
+
+- [Concepts → Phases](/concepts/phases) — what each `phase` value means
+- [Markdown format → Frontmatter](/markdown-format/frontmatter)
+- [Markdown format → Task syntax](/markdown-format/task-syntax)
+- [Markdown format → Fixes](/markdown-format/fixes) — same shape with a
+  `severity` field
+</content>
+</invoke>

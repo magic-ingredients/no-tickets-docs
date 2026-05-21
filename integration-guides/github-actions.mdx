@@ -1,6 +1,119 @@
 ---
-title: "github-actions"
-description: "Integration guide: github-actions."
+title: "GitHub Actions"
+description: "Push your .notickets/ state on every commit using the official no-tickets GitHub Action."
 ---
 
-<Info>Placeholder — content lands with the documentation-site feature.</Info>
+The official [`no-tickets/push-action`](https://github.com/no-tickets/push-action)
+publishes the state of your `.notickets/` directory to no-tickets every time
+your workflow runs. Pushes from your default branch are recorded as
+`origin: ci` and become the authoritative state for the project.
+
+## Prerequisites
+
+1. A no-tickets project. Create one in the [dashboard](https://app.no-tickets.com).
+2. A push token. Generate one from **Project settings → Tokens** in the
+   dashboard. Treat it like a deploy key.
+3. The token stored as a GitHub secret named `NT_PUSH_TOKEN` on your repo.
+
+## Minimal workflow
+
+```yaml
+# .github/workflows/notickets.yml
+name: no-tickets
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: no-tickets/push-action@v1
+        with:
+          token: ${{ secrets.NT_PUSH_TOKEN }}
+```
+
+That's it. On every push to `main` and on every PR, the action reads
+`.notickets/` and reports the state to no-tickets.
+
+## What the action does
+
+1. Validates the directory shape (`.notickets/<epic>/{epic,feature,fix}.md`).
+2. Parses every file's frontmatter and `## Tasks` section.
+3. Computes the delta against the last push for this branch.
+4. Sends the delta with `origin: ci` and the CI metadata (commit SHA, branch,
+   PR number, run URL).
+
+The dashboard's "this feature shipped in `abc1234`" links are populated from
+this metadata.
+
+## Inputs
+
+| Input | Default | Notes |
+|---|---|---|
+| `token` | — | **Required.** Push token; use a GitHub secret. |
+| `directory` | `.notickets` | Override if your spec lives elsewhere (rare). |
+| `dry-run` | `false` | Print the delta to the workflow log without sending. Useful for first-time setup. |
+| `fail-on-validation-error` | `true` | Set to `false` if you want broken frontmatter to warn instead of fail. |
+| `api-url` | `https://api.no-tickets.com` | Override for self-hosted / staging. |
+
+## Outputs
+
+| Output | When |
+|---|---|
+| `pushed-count` | Number of files in the push |
+| `delta-summary` | Human-readable summary string |
+| `dashboard-url` | Direct link to the project on the dashboard |
+
+Example using the outputs:
+
+```yaml
+- uses: no-tickets/push-action@v1
+  id: push
+  with:
+    token: ${{ secrets.NT_PUSH_TOKEN }}
+
+- name: Comment on PR
+  if: github.event_name == 'pull_request'
+  uses: actions/github-script@v7
+  with:
+    script: |
+      github.rest.issues.createComment({
+        issue_number: context.issue.number,
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        body: `📋 [no-tickets board](${{ steps.push.outputs.dashboard-url }}) updated: ${{ steps.push.outputs.delta-summary }}`,
+      })
+```
+
+## Pinning the action version
+
+Always pin to a major version (`@v1`) or a SHA. Don't use `@main` — it'll
+break your builds on the next breaking change.
+
+## Self-hosted runners
+
+The action makes outbound HTTPS calls to `api.no-tickets.com`. If your
+runner is behind a strict egress firewall, allowlist that host.
+
+## Troubleshooting
+
+- **`401 Unauthorized`** — token missing or revoked. Re-issue from the
+  dashboard.
+- **`403 EntitlementExceeded`** — your team has hit a hard limit. See
+  [Entitlements](/concepts/entitlements).
+- **`422 ValidationError`** — a frontmatter field is malformed. The error
+  body lists the offending file and field.
+
+## See also
+
+- [Generic CI](/integration-guides/generic-ci) — same shape using just the CLI
+- [PR workflows](/integration-guides/pr-workflows) — wire phase transitions to
+  PR state
+- [Concepts → Push origins](/concepts/push-origins)
+</content>
+</invoke>

@@ -1,6 +1,120 @@
 ---
-title: "fixes"
-description: "Markdown format: fixes."
+title: "Fixes"
+description: "Fix file format — bug tracking with reproduction steps, severity, and the same task contract as features."
 ---
 
-<Info>Placeholder — content lands with the markdown-format-templates feature.</Info>
+A **fix** is a bug fix tracked the same way features are. Fixes live next to
+their epic's `epic.md`:
+
+```
+.notickets/
+└── auth-flow/
+    ├── epic.md
+    └── logout-redirect-bug.md    ← this is what we're documenting
+```
+
+The shape is identical to a feature — same task list contract, same
+frontmatter base — with two differences: a `severity` field and a
+`## Reproduction Steps` section.
+
+## Required structure
+
+```markdown
+---
+id: logout-redirect-bug
+type: fix
+epic: auth-flow
+title: Logout redirects to /undefined
+severity: high
+phase: development
+status: in_progress
+created: 2026-05-20
+updated: 2026-05-20
+---
+
+# Logout redirects to /undefined
+
+## Description
+
+After clicking "Sign out", the user is redirected to `/undefined` instead of
+`/login`. Reported by 4 customers on 2026-05-18.
+
+## Reproduction Steps
+
+1. Sign in as any user
+2. Open the user menu in the navbar
+3. Click "Sign out"
+4. **Expected**: redirect to `/login`
+5. **Actual**: redirect to `/undefined`, page 404s
+
+## Root Cause
+
+`session.signOut()` returns the next URL as `undefined` when the session has
+already been cleared. The handler reads `.next` without a fallback.
+
+## Tasks
+
+### 1. Add a fallback to the redirect target
+status: completed
+
+Default to `/login` when `session.signOut().next` is missing.
+
+**Files to modify/create:**
+- `src/server/auth/sign-out.ts`
+
+**Expected changes:**
+- Fallback to `/login` when `next` is falsy
+- Regression test that mocks an already-cleared session
+
+### 2. Backfill regression test
+status: in_progress
+
+[...]
+```
+
+## Required fields
+
+| Field | Type | Notes |
+|---|---|---|
+| `id` | kebab-case string | Must match the filename (without `.md`) |
+| `type` | `fix` | Literal |
+| `epic` | kebab-case string | Parent epic ID |
+| `title` | string | Shown on the board |
+| `severity` | enum | `critical` \| `high` \| `medium` \| `low` |
+| `phase` | enum | Same as features — see [Phases](/concepts/phases) |
+| `status` | enum | `not_started` \| `in_progress` \| `completed` |
+| `created` | YYYY-MM-DD | When the fix file was created |
+| `updated` | YYYY-MM-DD | Last meaningful update |
+
+## Severity
+
+`severity` is the one field that's required on fixes but not on features.
+The values are deliberately coarse — four levels is enough to triage, more
+just invites bikeshedding:
+
+| Value | Use when |
+|---|---|
+| `critical` | Production is down or actively losing data |
+| `high` | Major feature is broken; customers are blocked |
+| `medium` | Annoying bug, has a workaround |
+| `low` | Cosmetic; can ship in the next release |
+
+## Reproduction Steps (recommended)
+
+Not parsed but expected by reviewers. A reproducible bug closes faster than
+one described as "sometimes the login doesn't work". The dashboard surfaces
+this section verbatim on the fix page.
+
+## Root Cause (optional)
+
+Filled in once the fix is found. Useful for postmortems and for future-you
+when the same area breaks again.
+
+## See also
+
+- [Markdown format → Features](/markdown-format/features) — same shape minus
+  severity
+- [Markdown format → Task syntax](/markdown-format/task-syntax)
+- [Concepts → Phases](/concepts/phases)
+</content>
+</invoke>

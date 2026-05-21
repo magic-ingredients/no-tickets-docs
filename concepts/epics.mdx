@@ -1,6 +1,74 @@
 ---
-title: "epics"
-description: "Concept: epics."
+title: "Epics"
+description: "How features and fixes are grouped into a body of work with a shared goal."
 ---
 
-<Warning>Placeholder — to be reframed around the event-store model.</Warning>
+An **epic** is a body of work with a single goal. It contains zero or more
+features and zero or more fixes. Epics are the top-level grouping on the
+board — every feature and fix belongs to exactly one epic.
+
+If you've used Jira, this maps to a Jira epic. If you've used Linear, it
+maps to a Linear project.
+
+## Where epics live
+
+Epics live in the `.notickets/` directory of your repo:
+
+```
+.notickets/
+├── auth-flow/                      ← epic directory (slug = epic id)
+│   ├── epic.md                     ← epic definition
+│   ├── google-oauth.md             ← feature
+│   ├── token-refresh.md            ← feature
+│   └── logout-redirect-bug.md      ← fix
+└── billing-portal/
+    ├── epic.md
+    └── ...
+```
+
+The directory name is the epic ID. The `epic.md` file inside it carries the
+title, description, and goals. Features and fixes are siblings of `epic.md`,
+linked back via their `epic:` frontmatter field.
+
+## Cross-project epics
+
+By default an epic lives in one repository. For work that spans multiple
+repos (e.g. a feature change that touches both `no-tickets-service` and
+`no-tickets`), epics can span projects.
+
+A **cross-project epic** is declared by its `id` appearing in multiple
+projects' `.notickets/` directories with the same `id` and `type: epic`. The
+dashboard fuses them: one epic card on the board, features and fixes from
+both projects listed underneath.
+
+The fuse is by `id`, not by title — keep epic IDs unique within a team if you
+don't want this behaviour.
+
+## Epic vs feature
+
+| | Epic | Feature |
+|---|---|---|
+| **Granularity** | A multi-week body of work | A shippable unit (days to a week) |
+| **Has phase?** | No (rolls up from children) | Yes |
+| **Has tasks?** | No | Yes |
+| **Has assignee?** | No (features have assignees; epics don't) | Yes |
+
+If you're tempted to put tasks directly under an epic, split it into
+features instead.
+
+## Phase rollup
+
+An epic's "phase" on the board is computed, not declared. The dashboard shows
+a small distribution bar: how many features/fixes are in each phase. An epic
+is rendered as "done" only when every child is `phase: done`.
+
+The rollup is in the dashboard only — there is no `phase` field on an epic's
+markdown file. Adding one is ignored.
+
+## See also
+
+- [Phases](/concepts/phases) — what gets rolled up
+- [Markdown format → epics](/markdown-format/epics) — the epic file format
+- [Cross-project epics — PRD](https://github.com/magic-ingredients/no-tickets-service/blob/main/docs/prd/no-tickets-team-dashboard/features/epics-cross-project.md)
+</content>
+</invoke>

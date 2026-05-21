@@ -1,6 +1,147 @@
 ---
-title: "frontmatter"
-description: "Markdown format: frontmatter."
+title: "Frontmatter"
+description: "Exhaustive field reference for every YAML frontmatter field on epics, features, and fixes."
 ---
 
-<Info>Placeholder — content lands with the markdown-format-templates feature.</Info>
+YAML frontmatter is the structured slice of every no-tickets file. The
+parser reads frontmatter strictly; unknown top-level fields are rejected.
+Tool-specific data goes under `meta:` (see below).
+
+The frontmatter block must be the first content in the file — three dashes,
+the YAML body, three dashes, then the markdown.
+
+```markdown
+---
+id: my-feature
+type: feature
+...
+---
+
+# My feature
+```
+
+## Field reference
+
+### Base fields (all document types)
+
+| Field | Type | Required | Notes |
+|---|---|:---:|---|
+| `id` | kebab-case string | ✓ | Must match the filename (without `.md`), or the directory name for `epic.md`. Lowercase, hyphen-separated. |
+| `type` | `epic` \| `feature` \| `fix` | ✓ | Document type — determines which other fields are required. |
+| `title` | string | ✓ | Human-readable. Shown on the board, in the feed, in search. |
+| `status` | `not_started` \| `in_progress` \| `completed` | ✓ | Workflow status — orthogonal to `phase`. |
+| `created` | `YYYY-MM-DD` | ✓ | Creation date. Set once and never updated. |
+| `updated` | `YYYY-MM-DD` | ✓ | Last meaningful update. The CLI bumps this on save. |
+| `meta` | object | — | Extensible bag for tool-specific data. See below. |
+
+### Feature / fix fields
+
+| Field | Type | Required | Notes |
+|---|---|:---:|---|
+| `epic` | kebab-case string | ✓ | Parent epic ID. Must match an existing `.notickets/<epic>/` directory. |
+| `phase` | `ideation` \| `development` \| `testing` \| `review` \| `done` | ✓ | Lifecycle phase — see [Phases](/concepts/phases). |
+| `assignee` | string | — | Member name or agent ID. Empty/missing means unassigned. |
+| `assignee_type` | `human` \| `agent` | — | Required if `assignee` is set. Drives avatar + filter. |
+
+### Fix-only fields
+
+| Field | Type | Required | Notes |
+|---|---|:---:|---|
+| `severity` | `critical` \| `high` \| `medium` \| `low` | ✓ | Triage priority. |
+
+## `meta` — the escape hatch
+
+`meta:` is the one field tools can extend without breaking the parser.
+Anything under `meta:` is preserved on save and round-trips through pushes
+unchanged.
+
+Conventions:
+
+- **Namespace your keys.** Tools should write under a sub-object named after
+  the tool: `meta.tiny_brain.quality_score`, not `meta.quality_score`.
+- **Don't put core data here.** If a field is part of the spec, it belongs
+  at the top level, not under `meta`.
+
+Worked example:
+
+```yaml
+meta:
+  tiny_brain:
+    quality_score: 82
+    tdd_compliant: true
+  internal_tracker:
+    jira_key: AUTH-1234
+```
+
+## Field validation
+
+The parser enforces a few rules beyond "must be the right type":
+
+1. **`id` must match the filename.** A file named `google-oauth.md` with
+   `id: googleoauth` is rejected on push.
+2. **Dates must be `YYYY-MM-DD`.** No timezones, no times.
+3. **`epic` must reference an existing epic.** A feature referencing a
+   non-existent epic is rejected on push.
+4. **`assignee_type` is required when `assignee` is set.** Either both, or
+   neither.
+
+## Worked examples
+
+### Minimal epic
+
+```yaml
+---
+id: auth-flow
+type: epic
+title: Authentication Flow
+status: in_progress
+created: 2026-05-20
+updated: 2026-05-21
+---
+```
+
+### Feature assigned to an agent
+
+```yaml
+---
+id: google-oauth
+type: feature
+epic: auth-flow
+title: Google OAuth sign-in
+phase: development
+status: in_progress
+assignee: claude-coder
+assignee_type: agent
+created: 2026-05-20
+updated: 2026-05-21
+meta:
+  tiny_brain:
+    quality_score: 78
+---
+```
+
+### Critical fix
+
+```yaml
+---
+id: logout-redirect-bug
+type: fix
+epic: auth-flow
+title: Logout redirects to /undefined
+severity: critical
+phase: testing
+status: in_progress
+assignee: maria
+assignee_type: human
+created: 2026-05-20
+updated: 2026-05-21
+---
+```
+
+## See also
+
+- [Markdown format → Epics](/markdown-format/epics) / [Features](/markdown-format/features) / [Fixes](/markdown-format/fixes)
+- [Concepts → Phases](/concepts/phases) — what each `phase` value means
+- [Concepts → Roles](/concepts/roles) — `assignee_type` semantics
+</content>
+</invoke>

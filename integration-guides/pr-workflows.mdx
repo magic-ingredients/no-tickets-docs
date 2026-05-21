@@ -1,6 +1,110 @@
 ---
-title: "pr-workflows"
-description: "Integration guide: pr-workflows."
+title: "PR workflows"
+description: "Drive phase transitions from pull-request lifecycle events."
 ---
 
-<Info>Placeholder — content lands with the documentation-site feature.</Info>
+The phase a feature sits in (`ideation` → `development` → `testing` →
+`review` → `done`) maps cleanly onto a typical pull-request lifecycle.
+This guide wires that mapping up so phases update without anyone hand-
+editing frontmatter.
+
+The mapping no-tickets ships with by default:
+
+| PR event | Resulting phase |
+|---|---|
+| Branch first commit | `development` |
+| PR opened (draft) | `development` |
+| PR marked ready for review | `review` |
+| CI green on the PR | `testing` (if CI runs after "ready for review") |
+| PR merged to default branch | `done` |
+| PR closed without merge | reverts to previous phase |
+
+If you want this mapping, you don't have to do anything beyond enabling the
+[GitHub Actions integration](/integration-guides/github-actions) — the
+action infers the phase from the GitHub event that triggered it.
+
+## Overriding the mapping
+
+The mapping is a default, not a rule. Two ways to override:
+
+1. **Per-feature** — set `phase:` explicitly in the feature's frontmatter.
+   Explicit always wins over inferred.
+2. **Per-project** — set a project-level mapping in the dashboard:
+   **Project settings → Workflow → Phase mapping**.
+
+A team that wants `phase: testing` to mean "deployed to a staging env" can
+re-map `testing` to fire on a separate `deploy-staging.yml` workflow instead
+of on the PR.
+
+## Linking features to PRs
+
+By default, the GitHub Action links a PR to a feature when the feature ID
+appears in the PR title or branch name:
+
+```
+feature/google-oauth          ← matches google-oauth.md
+chore: tweak google-oauth     ← also matches
+```
+
+The match is fuzzy: hyphens, underscores, and slashes are all separators.
+Multiple matches in one PR are allowed — phase transitions fire on all
+matched features.
+
+## Required-status-check pattern
+
+A common request: gate merges on no-tickets validation. Set up a required
+status check using the GitHub Action's `nt validate` output:
+
+```yaml
+# .github/workflows/notickets-validate.yml
+name: no-tickets validate
+
+on:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: no-tickets/push-action@v1
+        with:
+          token: ${{ secrets.NT_PUSH_TOKEN }}
+          dry-run: true                      # validation only
+          fail-on-validation-error: true
+```
+
+Then mark `no-tickets validate / validate` as a required status check in
+your branch protection rules.
+
+## Slash commands in PR comments
+
+The dashboard accepts a small set of slash commands posted as PR comments,
+authenticated by the commenter's GitHub identity (linked to their dashboard
+account):
+
+| Comment | Effect |
+|---|---|
+| `/nt assign @maria` | Sets `assignee: maria, assignee_type: human` on the matched feature |
+| `/nt defer task 3` | Sets task 3's status to `deferred` |
+| `/nt block "waiting on stripe"` | Sets phase to a blocked state with a reason |
+
+These are convenience hooks for reviewers; the canonical source remains the
+files in the repo. Slash-command edits ship as commits to the PR's source
+branch (with a `[skip ci]` marker on the commit message).
+
+## Multi-repo PRs
+
+For epics that span multiple repos
+([cross-project epics](/concepts/epics#cross-project-epics)), each repo's
+PR drives transitions on its own features only. The epic's overall progress
+rolls up from all features regardless of which repo owns them.
+
+## See also
+
+- [Concepts → Phases](/concepts/phases) — the underlying state machine
+- [GitHub Actions](/integration-guides/github-actions) — the integration
+  that drives most of this
+- [Concepts → Push origins](/concepts/push-origins) — `origin: ci` rules
+</content>
+</invoke>

@@ -1,18 +1,72 @@
 ---
 title: "Markdown format"
-description: "How no-tickets specs are written — epics, features, fixes, frontmatter, tasks."
+description: "The open spec for describing work in any repository — epics, features, fixes, frontmatter, and tasks."
 ---
 
-<Info>
-  Placeholder. The canonical markdown format spec moves here from
-  `no-tickets-service/docs/prd/.../markdown-format-templates.md` as Task 5 of the
-  documentation-site feature lands.
-</Info>
+no-tickets stores work as plain markdown files in your repository. There is
+no database to sync, no GUI to drag through — the files are the spec. The
+CLI, the dashboard, and any LLM tool all read and write the same format.
 
-## Sections
+This section is the canonical reference. Templates that ship in the CLI and
+in starter repos link back here rather than redocumenting the format.
 
-- [Epics](/markdown-format/epics)
-- [Features](/markdown-format/features)
-- [Fixes](/markdown-format/fixes)
-- [Frontmatter](/markdown-format/frontmatter)
-- [Task syntax](/markdown-format/task-syntax)
+## Directory layout
+
+```
+.notickets/
+├── config.json                    ← project connection (teamId, projectId)
+├── auth-flow/                     ← one directory per epic
+│   ├── epic.md                    ← epic definition (required if directory exists)
+│   ├── google-oauth.md            ← feature
+│   ├── token-refresh.md           ← feature
+│   └── logout-bug.md              ← fix
+└── billing-portal/
+    └── ...
+```
+
+Rules:
+
+- `.notickets/` lives at the repo root.
+- Every subdirectory of `.notickets/` is an epic. The directory name is the
+  epic's `id`.
+- Every `.md` file inside an epic directory is either an `epic.md` or a
+  feature/fix file. There is no other document type.
+- File names are slugs; `id` in the frontmatter must match the file name
+  minus `.md`.
+
+## Document types
+
+| Type | File | Purpose |
+|---|---|---|
+| `epic` | `<epic-slug>/epic.md` | Goal-scoped body of work |
+| `feature` | `<epic-slug>/<feature-slug>.md` | Shippable unit of functionality |
+| `fix` | `<epic-slug>/<fix-slug>.md` | Bug fix |
+
+All three share a frontmatter base; features and fixes add fields for
+phase, assignee, and (fixes only) severity. See the per-type pages below.
+
+## Pages
+
+- **[Epics](/markdown-format/epics)** — epic file format
+- **[Features](/markdown-format/features)** — feature file format
+- **[Fixes](/markdown-format/fixes)** — fix file format
+- **[Frontmatter](/markdown-format/frontmatter)** — exhaustive field reference
+- **[Task syntax](/markdown-format/task-syntax)** — how `## Tasks` sections parse
+
+## Design principles
+
+A few rules guide the format:
+
+1. **Plain markdown.** Renders correctly on GitHub, GitLab, in any IDE
+   preview, in any LLM context. No proprietary syntax.
+2. **Minimal required fields.** Templates that ship with the CLI use the
+   minimum that lets the dashboard render something useful. Everything else
+   is optional.
+3. **`meta` is the escape hatch.** Tool-specific fields live under
+   `meta:` so they don't pollute the core schema. Other tools (tiny-brain,
+   custom internal tooling) attach their own data there.
+4. **The format IS the API.** The HTTP API speaks the same shape as the
+   files. There is no separate "database schema" — projections are derived
+   from the files you push.
+</content>
+</invoke>
