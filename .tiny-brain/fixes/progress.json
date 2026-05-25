@@ -1,0 +1,66 @@
+{
+  "fixes": [
+    {
+      "id": "docs-site-analytics",
+      "title": "Wire Mintlify analytics integration into docs.json",
+      "status": "not_started",
+      "severity": "low",
+      "tasks": [
+        {
+          "id": "task-1",
+          "description": "Pick the analytics provider on the marketing site",
+          "status": "not_started"
+        },
+        {
+          "id": "task-2",
+          "description": "Wire the chosen provider into docs.json",
+          "status": "not_started"
+        },
+        {
+          "id": "task-3",
+          "description": "Smoke-test that events fire",
+          "status": "not_started"
+        }
+      ],
+      "filePath": ".tiny-brain/fixes/docs-site-analytics.md",
+      "reported": "2026-05-22T00:00:00.000Z",
+      "resolved": null
+    },
+    {
+      "id": "docs-site-deploy-webhook",
+      "title": "Reconnect Mintlify GitHub App so docs.no-tickets.com auto-deploys",
+      "status": "not_started",
+      "severity": "medium",
+      "tasks": [
+        {
+          "id": "task-1",
+          "description": "Reconnect the Mintlify GitHub App on this repo",
+          "status": "not_started"
+        },
+        {
+          "id": "task-2",
+          "description": "Trigger a redeploy to backfill stranded commits",
+          "status": "not_started"
+        },
+        {
+          "id": "task-3",
+          "description": "Verify live matches local",
+          "status": "not_started"
+        }
+      ],
+      "filePath": ".tiny-brain/fixes/docs-site-deploy-webhook.md",
+      "reported": "2026-05-25T00:00:00.000Z",
+      "resolved": "2026-05-25T11:00:00.000Z",
+      "resolution": {
+        "rootCause": "Mintlify project was originally hosted via the web editor with no GitHub App installed, so pushes to main never triggered a deploy and the live site drifted behind the repo.",
+        "fix": [
+          "Connected the magic-ingredients/no-tickets-docs repo from the Mintlify dashboard (replacing the hosted-editor source).",
+          "First post-connect deploy backfilled all stranded commits from main.",
+          "Verified live pages match local for /introduction, /api-reference/overview, and a generated endpoint page."
+        ],
+        "filesModified": []
+      }
+    }
+  ],
+  "lastSynced": "2026-05-25T10:57:47.974Z"
+}
