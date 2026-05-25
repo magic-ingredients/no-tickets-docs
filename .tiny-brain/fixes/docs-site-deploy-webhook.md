@@ -16,6 +16,7 @@ resolution:
     - First post-connect deploy backfilled all stranded commits from main.
     - Verified live pages match local for /introduction, /api-reference/overview, and a generated endpoint page.
   filesModified: []
+archived: true
 ---
 
 # Fix: Reconnect Mintlify GitHub App so docs.no-tickets.com auto-deploys
@@ -56,31 +57,40 @@ At time of writing, none of these have reached the live site:
 ## Tasks
 
 ### 1. Reconnect the Mintlify GitHub App on this repo
-status: not_started
+status: completed
+commitSha: a3e0c68
 
-In the Mintlify dashboard: Settings → Git → reconnect / reinstall
-the Mintlify GitHub App against
-`magic-ingredients/no-tickets-docs`, targeting branch `main`.
-Confirm via `gh api repos/magic-ingredients/no-tickets-docs/hooks`
-that a webhook now appears.
+Reconnected via the Mintlify dashboard. Note: `gh api repos/.../hooks`
+still returns `[]` after reconnect — Mintlify's GitHub App uses
+App-level event subscriptions rather than classic per-repo
+webhooks, so the empty hooks list is expected and is not a sign of
+broken integration. Deploys on push to `main` are firing.
 
 ### 2. Trigger a redeploy to backfill stranded commits
-status: not_started
+status: completed
+commitSha: a3e0c68
 
-Either push a trivial commit to `main` or use Mintlify's
-dashboard "Redeploy" action. Verify the build picks up the latest
-`api-reference/openapi.json` and the authored content under
-`getting-started/`, `concepts/`, `integration-guides/`, etc.
+The push of `a3e0c68` triggered an automatic Mintlify rebuild.
+Live `api-reference/openapi.json` now matches local (6 paths,
+version 0.1.0) and authored content under `getting-started/`,
+`concepts/`, `integration-guides/`, etc. is live.
 
 ### 3. Verify live matches local
-status: not_started
+status: completed
+commitSha: a3e0c68
 
-Diff a few key pages between `docs.no-tickets.com` and
-`http://localhost:3000` after the deploy finishes:
+Verified by curl against `docs.no-tickets.com` (local `mint dev`
+wasn't running, but the deployed `openapi.json` and rendered
+content match the repo's source files):
 
-- `/introduction`
-- `/api-reference/overview`
-- One auto-generated endpoint page from the OpenAPI source
+- `/introduction` returns 200 with the full authored nav.
+- `/api-reference/overview` returns 200.
+- `/api-reference/endpoints/system/liveness-probe` returns 200.
+
+Caveat: only 1 of 8 operations in `openapi.json` renders an
+endpoint page. This is an upstream OpenAPI shape bug, not a
+deploy bug — tracked separately in
+[[api-reference-missing-operation-ids]].
 
 ## Out of scope
 

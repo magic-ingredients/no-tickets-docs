@@ -18,3 +18,10 @@ pnpm-debug.log*
 # deliberately absent from this list.
 cli-reference/generated/
 mcp-tools/generated/
+
+# tiny-brain operational data (auto-added)
+# Note: .tiny-brain/fixes/ is intentionally tracked so fix docs are
+# reviewable in PRs and visible to external contributors.
+.tiny-brain/reviews/
+.tiny-brain/telemetry/
+.tiny-brain/prune.log
