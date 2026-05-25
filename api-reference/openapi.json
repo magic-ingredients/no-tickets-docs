@@ -11,5 +11,28 @@
       "description": "Production"
     }
   ],
-  "paths": {}
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Liveness probe",
+        "description": "Placeholder operation so Mintlify's API reference tab renders before the first sync push from no-tickets-service lands.",
+        "responses": {
+          "200": {
+            "description": "Service is up",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["status"],
+                  "properties": {
+                    "status": { "type": "string", "enum": ["ok"] }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
