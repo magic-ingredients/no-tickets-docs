@@ -8,6 +8,7 @@
   "paths": {
     "/health": {
       "get": {
+        "operationId": "getHealth",
         "summary": "Liveness probe",
         "responses": {
           "200": {
@@ -41,6 +42,7 @@
     },
     "/v1/waitlist": {
       "post": {
+        "operationId": "joinWaitlist",
         "summary": "Join the early-access waitlist",
         "responses": {
           "201": {
@@ -114,6 +116,7 @@
     },
     "/v1/auth/me": {
       "get": {
+        "operationId": "getCurrentUser",
         "summary": "Current user, organisation, permissions, team, and projects",
         "responses": {
           "200": {
@@ -281,6 +284,7 @@
     },
     "/v1/projects": {
       "get": {
+        "operationId": "listProjects",
         "summary": "List projects in the caller’s org",
         "responses": {
           "200": {
@@ -364,6 +368,7 @@
         ]
       },
       "post": {
+        "operationId": "createProject",
         "summary": "Create a project",
         "responses": {
           "201": {
@@ -454,6 +459,7 @@
     },
     "/v1/projects/{projectId}": {
       "patch": {
+        "operationId": "updateProject",
         "summary": "Update a project",
         "responses": {
           "200": {
@@ -552,6 +558,7 @@
         ]
       },
       "delete": {
+        "operationId": "deleteProject",
         "summary": "Delete a project",
         "responses": {
           "204": {
@@ -611,6 +618,7 @@
     },
     "/v1/projects/{projectId}/feed": {
       "get": {
+        "operationId": "getProjectFeed",
         "summary": "Cross-domain project feed",
         "responses": {
           "200": {
