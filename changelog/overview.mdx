@@ -1,0 +1,37 @@
+---
+title: "Changelog"
+description: "Product updates and improvements to no-tickets."
+---
+
+<Update label="2026-05-29" description="v0.1.4">
+
+## New features
+
+**Agent session lifecycle for actor attribution**
+
+A new `no-tickets session` command lets agent harnesses declare which agent is running before events fire. Use `session start` to register the agent identity, `session show` to inspect the active session, and `session end` to clear it. Events published while a session is active are stamped with the declared actor — opt-in, never required.
+
+- See [`session start`](/cli-reference/commands/session/start), [`session show`](/cli-reference/commands/session/show), and [`session end`](/cli-reference/commands/session/end).
+
+**Actor metadata on `publish`**
+
+`no-tickets publish` now accepts actor and model metadata directly — `--actor-type`, `--agent-id`, `--model`, `--prompt-tokens`, `--completion-tokens`, and `--call-id` — so teams can attribute events without going through a session. First-time publishers see a one-shot hint pointing at the new attribution flow.
+
+- See the [`publish` reference](/cli-reference/commands/publish).
+
+## Updates
+
+**Schemas widened to v0.3.0**
+
+The event schemas bundle moves to v0.3.0 with a widened metadata contract. Existing payloads keep validating; new optional fields cover actor, model, and token-usage attribution end-to-end.
+
+**Auto-generated CLI reference**
+
+The [CLI reference](/cli-reference/overview) is now generated directly from the CLI itself on every release, so flags, defaults, and descriptions stay in lockstep with the binary you have installed.
+
+## Fixes
+
+- Releases now publish updated CLI documentation reliably on tag push.
+- The TypeScript SDK no longer pulls in an unused schemas dependency, trimming install size for SDK consumers.
+
+</Update>
