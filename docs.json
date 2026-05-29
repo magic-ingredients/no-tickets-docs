@@ -83,7 +83,17 @@
         "groups": [
           {
             "group": "CLI Reference",
-            "pages": ["cli-reference/overview"]
+            "pages": [
+              "cli-reference/overview",
+              "cli-reference/commands/init",
+              "cli-reference/commands/logout",
+              "cli-reference/commands/publish",
+              "cli-reference/commands/session",
+              "cli-reference/commands/status",
+              "cli-reference/commands/token",
+              "cli-reference/commands/update",
+              "cli-reference/commands/validate"
+            ]
           }
         ]
       },
