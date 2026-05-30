@@ -210,6 +210,30 @@ Same as Task 5 for the five `NT_PUSH_TOKEN` references. Verify
 that the MCP server config block accurately reflects the real
 `no-tickets-mcp` env contract while in there.
 
+### 6a. Update api-reference/overview.mdx
+status: in_progress
+
+Same class of drift on the API reference landing page. Already
+removed the stale `<Warning>` block about the placeholder
+openapi sync (it was lying — the sync works). Still to do on
+this page:
+
+- **Base URL** (line ~34): currently documented as
+  `https://api.no-tickets.com`, which 404s. install.md doesn't
+  document an API URL at all — the binary handles host
+  selection internally. Either pin the real public host once
+  someone confirms what it is, or drop the "Base URL" section
+  entirely until the API is publicly deployed.
+- **`NT_API_URL` env var** (line ~38): no such override exists
+  in the binary. Same shape as the `NT_PUSH_TOKEN` invention.
+- **Auth section** (line ~29): "Push tokens are issued per
+  project from the dashboard" — same fictional UI flow. Real
+  flow is `no-tickets token add <project> <token>` on a
+  workstation (per the canonical reference block in Task 1).
+- **Auth table** (line ~23-27): "Bearer" header form is
+  plausible but should be confirmed against the actual service
+  before pinning.
+
 ### 7. Verify on live after deploy
 status: not_started
 

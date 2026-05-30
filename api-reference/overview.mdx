@@ -7,17 +7,6 @@ The no-tickets REST API is how the CLI, dashboard, and integrations talk to
 `no-tickets-service`. Everything you can do in the dashboard you can do with the
 API.
 
-<Warning>
-  The spec file (`api-reference/openapi.json`) is currently a placeholder
-  while the cross-repo publish workflow is being wired up — routes will
-  appear here once the first sync push from `no-tickets-service` lands.
-  The set of routes registered upstream is intentionally narrow while the
-  event-store reset settles — see the [sequencing
-  note](https://github.com/magic-ingredients/no-tickets-service/blob/main/docs/prd/no-tickets-team-dashboard/features/documentation-site.md#sequencing-blocked-on-the-architectural-reset)
-  for context. Routes on the `FLUX` allow-list are documented in code today and
-  surface here as their schemas stabilise.
-</Warning>
-
 ## Authentication
 
 | Auth mode | Used by | Header |
