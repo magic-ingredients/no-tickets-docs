@@ -38,7 +38,7 @@ type: feature
 
 | Field | Type | Required | Notes |
 |---|---|:---:|---|
-| `epic` | kebab-case string | ✓ | Parent epic ID. Must match an existing `.notickets/<epic>/` directory. |
+| `epic` | kebab-case string | ✓ | Parent epic ID. Must match an existing `.tiny-brain/<epic>/` directory. |
 | `phase` | `ideation` \| `development` \| `testing` \| `review` \| `done` | ✓ | Lifecycle phase — see [Phases](/concepts/phases). |
 | `assignee` | string | — | Member name or agent ID. Empty/missing means unassigned. |
 | `assignee_type` | `human` \| `agent` | — | Required if `assignee` is set. Drives avatar + filter. |

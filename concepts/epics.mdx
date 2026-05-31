@@ -12,10 +12,10 @@ maps to a Linear project.
 
 ## Where epics live
 
-Epics live in the `.notickets/` directory of your repo:
+Epics live in the `.tiny-brain/` directory of your repo:
 
 ```
-.notickets/
+.tiny-brain/
 ├── auth-flow/                      ← epic directory (slug = epic id)
 │   ├── epic.md                     ← epic definition
 │   ├── google-oauth.md             ← feature
@@ -37,7 +37,7 @@ repos (e.g. a feature change that touches both `no-tickets-service` and
 `no-tickets`), epics can span projects.
 
 A **cross-project epic** is declared by its `id` appearing in multiple
-projects' `.notickets/` directories with the same `id` and `type: epic`. The
+projects' `.tiny-brain/` directories with the same `id` and `type: epic`. The
 dashboard fuses them: one epic card on the board, features and fixes from
 both projects listed underneath.
 

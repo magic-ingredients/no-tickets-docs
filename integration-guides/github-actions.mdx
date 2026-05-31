@@ -1,10 +1,10 @@
 ---
 title: "GitHub Actions"
-description: "Push your .notickets/ state on every commit using the official no-tickets GitHub Action."
+description: "Push your .tiny-brain/ state on every commit using the official no-tickets GitHub Action."
 ---
 
 The official [`no-tickets/push-action`](https://github.com/no-tickets/push-action)
-publishes the state of your `.notickets/` directory to no-tickets every time
+publishes the state of your `.tiny-brain/` directory to no-tickets every time
 your workflow runs. Pushes from your default branch are recorded as
 `origin: ci` and become the authoritative state for the project.
 
@@ -38,11 +38,11 @@ jobs:
 ```
 
 That's it. On every push to `main` and on every PR, the action reads
-`.notickets/` and reports the state to no-tickets.
+`.tiny-brain/` and reports the state to no-tickets.
 
 ## What the action does
 
-1. Validates the directory shape (`.notickets/<epic>/{epic,feature,fix}.md`).
+1. Validates the directory shape (`.tiny-brain/<epic>/{epic,feature,fix}.md`).
 2. Parses every file's frontmatter and `## Tasks` section.
 3. Computes the delta against the last push for this branch.
 4. Sends the delta with `origin: ci` and the CI metadata (commit SHA, branch,
@@ -56,7 +56,7 @@ this metadata.
 | Input | Default | Notes |
 |---|---|---|
 | `token` | — | **Required.** Push token; use a GitHub secret. |
-| `directory` | `.notickets` | Override if your spec lives elsewhere (rare). |
+| `directory` | `.tiny-brain` | Override if your spec lives elsewhere (rare). |
 | `dry-run` | `false` | Print the delta to the workflow log without sending. Useful for first-time setup. |
 | `fail-on-validation-error` | `true` | Set to `false` if you want broken frontmatter to warn instead of fail. |
 | `api-url` | `https://api.no-tickets.com` | Override for self-hosted / staging. |
