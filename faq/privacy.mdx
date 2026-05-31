@@ -1,6 +1,67 @@
 ---
 title: "Privacy"
-description: "FAQ: privacy."
+description: "What no-tickets stores and what it never sees."
 ---
 
-<Info>Placeholder.</Info>
+## We don't see your source code
+
+no-tickets is an observability layer for project state. The CLI
+(`no-tickets publish`) sends **structured event payloads** to the
+API — feature names, task statuses, test counts, progress
+percentages, commit SHAs, timestamps. Your source code is not in
+that payload and never reaches our servers.
+
+If you want to confirm what a payload contains before sending it,
+[`no-tickets validate`](/cli-reference/commands/validate) prints
+the resolved event JSON against the bundled JSON Schema without
+making any network call.
+
+## What we do store
+
+Every event you publish is persisted to the event store so the
+board and activity feed can be replayed. A typical event looks
+like:
+
+- **Event type** — e.g. `ai.task.completed.v1`
+- **Project** — the project key you scoped the push token to
+- **Actor** — agent identity or human session id
+- **Timestamps** — `occurredAt`, `receivedAt`
+- **Payload** — the JSON `--data` you passed, validated against
+  the type's schema
+- **Source metadata** — CLI version, source name, optional
+  attributes you set with `--source-attribute`
+
+Read-only metadata about your team (org name, plan, push tokens
+you've issued) is also stored to power authentication and
+entitlements.
+
+## What we don't store
+
+- Source code, diffs, file contents.
+- Branch names and commit messages, unless you explicitly include
+  them in the event payload.
+- Cookies or tracking data from your dashboard browsing — the
+  dashboard is authenticated session-based; we don't run third-party
+  analytics on app pages.
+
+## Tokens and authentication
+
+Push tokens are scoped per project and treated as credentials.
+Anyone holding a push token can write to that project's feed —
+treat them like deploy keys. If a token leaks, revoke it from the
+dashboard and the next attempted use returns `401 Unauthorized`.
+
+## Data export and deletion
+
+- **Export**: every event you've published is retrievable through
+  the [REST API](/api-reference/overview). For bulk export, the
+  `feed` endpoint paginates indefinitely.
+- **Deletion**: deleting a project removes its events from the
+  event store immediately. Per-event deletion is intentionally
+  not supported — see [Data retention](/faq/data-retention) for
+  the reasoning.
+
+## See also
+
+- [Data retention](/faq/data-retention) — how long event history is kept
+- [Pricing](/faq/pricing) — plan comparison

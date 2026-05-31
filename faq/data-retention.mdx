@@ -1,6 +1,47 @@
 ---
 title: "Data retention"
-description: "FAQ: data retention."
+description: "How long no-tickets keeps the event history on each plan."
 ---
 
-<Info>Placeholder.</Info>
+no-tickets stores the full event stream for your projects so the
+board and activity feed can be replayed, audited, and queried over
+time. How long that history is retained depends on your plan.
+
+| Plan | Event retention |
+|------|----------------|
+| **Free** | 30 days rolling |
+| **Solo** | Unlimited |
+| **Pro** | Unlimited |
+| **Scale** | Unlimited |
+
+Retention is measured from the moment an event is published. On the
+Free tier, events older than 30 days are pruned from the event
+store nightly; the derived board state for periods before the
+retention window is also no longer queryable.
+
+## What "unlimited" means
+
+Paid plans keep every event you push for as long as your account is
+active. There is no auto-expiry — historical board state stays
+queryable, and the activity feed can scroll back to your first push.
+
+If you cancel a paid plan and the account drops to Free, the rolling
+30-day window applies again. Events older than that become
+unrecoverable from the API. Export what you need before downgrading.
+
+## Deleting events on demand
+
+Project deletion removes the project's events from the event store
+immediately and irrevocably. There is no soft-delete window for
+project-scoped data.
+
+Per-event deletion is intentionally **not** supported — the event
+stream is the source of truth for the derived board state, and
+selectively removing events would silently distort the board. The
+right primitive for "this is wrong" is to publish a corrective
+event, not to delete the original.
+
+## See also
+
+- [Pricing](/faq/pricing) — full plan comparison
+- [Privacy](/faq/privacy) — what each event contains

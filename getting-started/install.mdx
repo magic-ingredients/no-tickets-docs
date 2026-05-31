@@ -3,30 +3,99 @@ title: "Install the CLI"
 description: "Install the no-tickets binary on macOS, Linux, or Windows."
 ---
 
-<Info>
-  Placeholder. The canonical install instructions live in
-  [`no-tickets/docs/install.md`](https://github.com/magic-ingredients/no-tickets/blob/main/docs/install.md)
-  until the sync workflow lands (Task 4 of the documentation-site feature).
-</Info>
+The `no-tickets` release ships two binaries — `no-tickets` (the CLI) and
+`no-tickets-mcp` (the MCP server). Every install channel installs both
+together; you don't have to pick.
 
-## Quick install (macOS / Linux)
+## Supported platforms
+
+| OS | Architectures |
+|----|--------------|
+| macOS | Apple Silicon (`aarch64`), Intel (`x86_64`) |
+| Linux | `x86_64-musl`, `aarch64-musl` — statically linked. Runs on Alpine, `distroless/static`, and glibc systems. Does **not** run on `distroless/base`, which expects libc resolution at runtime. |
+| Windows | `x86_64` |
+
+## macOS and Linux — shell installer
 
 ```bash
 curl --proto '=https' --tlsv1.2 -LsSf https://get.no-tickets.com | sh
 ```
 
-## Quick install (Windows)
+Installs both binaries to `~/.local/bin/`. Add that to your `PATH` if it
+isn't already:
 
-```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://get.no-tickets.com/installer.ps1 | iex"
+```bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc   # zsh
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc  # bash
 ```
 
-## Homebrew
+The shorthand resolves to
+`https://github.com/magic-ingredients/no-tickets/releases/latest/download/no-tickets-installer.sh`
+— useful for environments where `get.no-tickets.com` is blocked.
+
+## macOS and Linux — Homebrew
 
 ```bash
 brew install magic-ingredients/tap/no-tickets
 ```
 
-Full channel-by-channel guidance — Homebrew tap, direct tarball, CI recipes,
-`no-tickets self-update` — will move here from the source repo as the docs
-sync pipeline comes online.
+`brew tap magic-ingredients/tap` is implicit on the first install.
+
+## Windows — PowerShell installer
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://get.no-tickets.com/installer.ps1 | iex"
+```
+
+Installs both binaries to `%USERPROFILE%\.local\bin\` and prepends that
+directory to the user `PATH`. Restart the shell after install.
+
+## Verify the install
+
+```bash
+no-tickets --version       # prints the release version
+no-tickets-mcp --version   # prints the same version — the binaries ship in lockstep
+no-tickets status          # prints auth + locally registered tokens as JSON
+```
+
+`no-tickets status` works without authentication. The next step is
+[Your first push](/getting-started/first-push).
+
+## Updating
+
+How `no-tickets` updates depends on the install channel.
+
+| Channel | Update command |
+|---------|---------------|
+| `curl … \| sh` / direct download | `no-tickets update` |
+| Homebrew | `brew upgrade no-tickets` |
+| Direct tarball | re-download and re-install |
+
+`no-tickets update` detects which channel placed the binary and prints
+the right command for that channel rather than running an in-place
+swap that would conflict with the package manager.
+
+<Warning>
+  **If you're on v0.1.2 and ran `self-update`**, the bundled updater
+  shipped a broken archive format and left a non-executable file at
+  `~/.local/bin/no-tickets`. Recover by re-running the shell
+  installer (it overwrites the corrupt file with a working binary).
+  From v0.1.3 on the subcommand is renamed from `self-update` to
+  just `update`.
+</Warning>
+
+## Advanced install paths
+
+For air-gapped environments, restricted runners, build-from-source,
+direct tarball downloads with `sha256` verification, and the (coming
+soon) `cargo install` channel, see the canonical install reference
+in the binary repo:
+[`magic-ingredients/no-tickets/docs/install.md`](https://github.com/magic-ingredients/no-tickets/blob/main/docs/install.md).
+
+## Using no-tickets in CI
+
+Most CI runners install fresh on every job. The shell installer fits
+that model — see [GitHub Actions](/integration-guides/github-actions),
+[Generic CI](/integration-guides/generic-ci), and the other recipes
+under [Integration guides](/integration-guides/overview) for
+per-provider templates.

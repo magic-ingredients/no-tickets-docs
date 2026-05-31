@@ -1,12 +1,66 @@
 ---
 title: "FAQ"
-description: "Frequently asked questions."
+description: "Common questions about no-tickets, tiny-brain, and how they work together."
 ---
 
-<Info>Placeholder — populated as inbound questions repeat.</Info>
+Quick answers to questions we hear most often. For deeper material
+see the topic pages linked below.
+
+## What is no-tickets?
+
+no-tickets is the observability layer for agentic coding. AI agents
+ship features in minutes — legacy project trackers, built around
+humans hand-creating tickets, can't keep up. no-tickets inverts the
+model: **dev activity generates the board automatically**. Devs and
+agents push structured events as they work; PMs, stakeholders, and
+eng leads see a live board without anyone manually moving cards.
+
+## What is tiny-brain?
+
+[tiny-brain](https://github.com/magic-ingredients/tiny-brain) is the
+open-source CLI that runs inside your repo. It enforces TDD,
+runs adversarial code reviews, tracks coverage and mutation
+testing, and manages PRD-to-task progress. It's the guardrails that
+keep AI agents producing quality code — and it's the recommended
+way to generate the structured state no-tickets shows on the board.
+
+## Do I need tiny-brain to use no-tickets?
+
+No. tiny-brain is the easiest way to generate project state, but
+no-tickets accepts any state snapshot via [its
+API](/api-reference/overview). If you have your own tooling that
+produces structured progress data, you can push it directly with
+the [`no-tickets` CLI](/cli-reference/overview) or the REST API.
+
+## Is my code sent to no-tickets?
+
+**No.** no-tickets never sees your source code. It receives
+structured state snapshots — feature names, task statuses, test
+counts, progress percentages. Your code stays in your repo. See
+[Privacy](/faq/privacy) for the full data inventory.
+
+## How does pricing work?
+
+You pay for **sync events** (the updates devs and agents push) and
+**active pushers** — viewers are unlimited on every plan. Full
+breakdown on the [Pricing](/faq/pricing) page.
+
+## Can I use this with GitLab or Bitbucket?
+
+The CLI push model works with any git host. GitHub integration
+(webhook-based updates) is available on the Pro plan; GitLab and
+Bitbucket webhook support is on the roadmap.
+
+## Why not just use Jira or Linear?
+
+Jira and Linear are built for humans creating tickets. In the
+agentic era, AI agents move too fast for that model. no-tickets
+inverts it: dev activity generates the board automatically. PMs
+and Product Owners organise views on top and coordinate the wider
+business around the releases.
 
 ## Topics
 
-- [Pricing](/faq/pricing)
-- [Data retention](/faq/data-retention)
-- [Privacy](/faq/privacy)
+- [Pricing](/faq/pricing) — plan comparison, sync events, add-ons
+- [Data retention](/faq/data-retention) — event history per plan
+- [Privacy](/faq/privacy) — what we store, what we never see
