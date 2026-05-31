@@ -1,6 +1,99 @@
 ---
 title: "Dashboard tour"
-description: "A walkthrough of the no-tickets dashboard."
+description: "What each page of the no-tickets dashboard surfaces, and when you'd use it."
 ---
 
-<Info>Placeholder — content lands alongside the team-dashboard-board feature.</Info>
+The dashboard at [`app.no-tickets.com`](https://app.no-tickets.com)
+is where the events you push land — turned into a live board,
+activity feed, engineering metrics, and project administration. This
+page walks each major area and what it's for.
+
+<Note>
+  This is a structural tour, not a screenshot-by-screenshot
+  walkthrough. The UI iterates faster than docs; if something on
+  this page doesn't match what you see in-app, trust the app.
+</Note>
+
+## Board
+
+The default landing view for a project. It shows the **current
+state of every feature and task** the project's pushers have
+reported, grouped by phase (e.g. red / green / refactor for TDD
+work, or your project's configured phases).
+
+Reading the board is free on every plan — viewers don't count
+against your pusher limit. PMs and stakeholders typically live
+here.
+
+Each card derives from the event stream: feature names, task
+counts, completion percentages, and recent activity all come from
+events your devs and agents publish. Cards update in real time as
+new events arrive; there's no manual refresh.
+
+## Activity feed
+
+Every event published to the project, in reverse chronological
+order. Use the feed when you want the **raw stream** — what
+happened, when, who published it, and what the payload was.
+
+The feed is the source of truth; the board is a derived view. If
+something looks wrong on the board, the feed is where you confirm
+whether the underlying event was published correctly.
+
+Each row links to the full event payload (JSON), the actor
+(agent or human session), and the source metadata (CLI version,
+commit SHA if the publish step included it).
+
+## Engineering / AI
+
+Roll-ups across the events for engineering health: test counts
+over time, coverage trends, mutation-testing results, AI agent
+sessions, and per-agent throughput. This is the view eng leads
+typically open when they want to know whether the agents working
+in their repos are actually shipping quality code.
+
+The data here comes from `eng.*` and `ai.*` event types. If your
+project doesn't emit those, the section will be sparse — the
+[tiny-brain CLI](https://github.com/magic-ingredients/tiny-brain)
+generates them as a side effect of TDD enforcement and review
+runs, which is the easiest way to populate this view.
+
+## Project
+
+Project-level settings and views — push tokens, configured
+phases, board view configuration, and project metadata.
+
+Push token issuance lives here. Mint a token, copy the raw value,
+and register it on your workstation or CI with `no-tickets token
+add` (see [Your first
+push](/getting-started/first-push#2-mint-a-push-token)).
+
+## Settings
+
+Account- and team-level administration:
+
+- **Billing** — current plan, sync-event usage against the
+  monthly window, upgrade / downgrade.
+- **Members** — who has access to your team's projects, with role
+  assignments.
+- **Invites** — invite teammates by email.
+
+## Onboarding
+
+The first-time setup flow for a new account. Walks you through
+project creation, your first push token, and a sample CLI command
+to publish a hello-world event.
+
+If you've already done [Your first
+push](/getting-started/first-push), you've effectively completed
+this flow from the CLI side; the in-app onboarding repeats it for
+users who'd rather follow a guided UI.
+
+## What's next
+
+- **Wire publish into CI** — [GitHub Actions](/integration-guides/github-actions)
+  for the canonical recipe.
+- **Read the API spec** — [REST API reference](/api-reference/overview)
+  if you want to push events without the CLI.
+- **Read the concepts** — [Concepts overview](/concepts/overview)
+  for the model behind phases, push origins, and entitlements.
