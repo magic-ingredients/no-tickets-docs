@@ -1,6 +1,93 @@
 ---
 title: "Your first push"
-description: "Send your first event to no-tickets from the CLI."
+description: "Send your first event to no-tickets and watch it land on the board."
 ---
 
-<Info>Placeholder — content lands with the event-repository foundation.</Info>
+This walks through the four steps from a fresh install to a live
+event on your board: project, token, registration, publish. It
+takes about five minutes.
+
+## 1. Create a project
+
+Sign in at [`app.no-tickets.com`](https://app.no-tickets.com) and
+create a project. The project name becomes the `--project` value
+you'll use from the CLI — short, lowercase, no spaces is the
+convention (e.g. `web-app`, `pricing-engine`).
+
+If this is your first time, the dashboard walks you through
+account creation; the Free plan is available without a credit
+card.
+
+## 2. Mint a push token
+
+From the project's settings in the dashboard, issue a **push
+token**. Treat it like a deploy key — anyone holding it can write
+to that project's feed.
+
+Copy the raw token value (the long `nt_push_…` string). You'll
+need it in the next step.
+
+## 3. Register the token locally
+
+```bash
+no-tickets token add <project> <token>
+```
+
+Replace `<project>` with the project name and `<token>` with the
+value you copied. The token is stored in your local registry
+(`~/.config/no-tickets/`); no network call is made.
+
+Verify it's there:
+
+```bash
+no-tickets status
+```
+
+The output is JSON. The `tokens` block should now list your
+project with its label.
+
+## 4. Publish your first event
+
+```bash
+no-tickets publish \
+  --project <project> \
+  --type ai.task.completed.v1 \
+  --data '{"taskId":"hello-world","outcome":"success"}'
+```
+
+`--type` is the event schema id; `--data` is the JSON payload.
+For a full list of flags (`--actor-type`, `--dedupe-key`,
+`--file` for batching, etc.) see the
+[`publish` command reference](/cli-reference/commands/publish).
+
+If everything's wired up you'll see a one-line success on stderr
+with the event id. Open the project's board on the dashboard —
+the event appears in the activity feed in real time.
+
+## What's next
+
+- **Wire it into CI** — see [GitHub Actions](/integration-guides/github-actions)
+  or [Generic CI](/integration-guides/generic-ci) for per-provider
+  recipes.
+- **Take the dashboard tour** — [Dashboard tour](/getting-started/dashboard-tour)
+  shows what the board surfaces from the events you push.
+- **Browse event types** — every event payload is validated
+  against a JSON Schema you can inspect with
+  [`no-tickets validate`](/cli-reference/commands/validate).
+
+## Troubleshooting
+
+- **`401 Unauthorized`** on publish — the token isn't registered
+  locally or has been revoked. Re-run `no-tickets token add` and
+  check `no-tickets status`.
+- **`422 ValidationError`** — the `--data` JSON doesn't match the
+  event type's schema. `no-tickets validate --type <type> --data
+  '<json>'` runs the same check locally without sending.
+- **No event on the board** — the dashboard polls the feed; if
+  the event is in the activity log but not the board, the event
+  type may not drive a board state change. Most `ai.task.*` and
+  `feature.*` events do; ad-hoc types may need a board view
+  configured.
+
+For a fuller error catalog see [Common
+errors](/troubleshooting/common-errors).

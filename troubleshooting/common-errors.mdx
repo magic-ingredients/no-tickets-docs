@@ -1,6 +1,142 @@
 ---
 title: "Common errors"
-description: "Common no-tickets errors and their fixes."
+description: "HTTP error codes and CLI failure modes, with recovery steps."
 ---
 
-<Info>Placeholder.</Info>
+The no-tickets API returns one of a small set of error envelopes
+on failure. The CLI surfaces these directly. Use the table below
+to map a status code to its meaning, then jump to the section for
+the recovery steps.
+
+| Status | Error | Most common cause |
+|---|---|---|
+| `401` | `Unauthorized` | Token missing, revoked, or not registered locally |
+| `403` | `EntitlementExceeded` | Hit a plan limit (events, pushers, projects) |
+| `403` | other | Token doesn't have access to that project |
+| `404` | `NotFound` | Project doesn't exist or you don't have access |
+| `422` | `ValidationError` | Payload doesn't match the event-type schema |
+| `429` | `RateLimited` | Per-token rate limit hit (60 req/min default) |
+| `5xx` | server error | Transient — retry with backoff |
+
+## `401 Unauthorized`
+
+The push token in the `Authorization` header is missing, revoked,
+or wasn't registered locally.
+
+**Check first:**
+
+```bash
+no-tickets status
+```
+
+The `tokens` block should list the project you're publishing to.
+If it doesn't, register the token:
+
+```bash
+no-tickets token add <project> <token>
+```
+
+If the token *is* registered but the call still returns 401, the
+dashboard side may have revoked it. Mint a new token from the
+project settings and re-register.
+
+## `403 EntitlementExceeded`
+
+You've hit a hard limit on your plan. The response body names the
+breached limit:
+
+```json
+{ "error": "EntitlementExceeded", "entitlement": "projects" }
+```
+
+Possible values: `projects`, `events`, `pushers`. See
+[Pricing](/faq/pricing) for the per-plan limits and
+[Concepts → Entitlements](/concepts/entitlements) for how they're
+enforced.
+
+To unblock:
+
+- **`events`** — wait for the monthly window to reset, or upgrade
+  the plan. On Pro you can also pay for overage at $0.005 per
+  event.
+- **`pushers`** — remove an inactive pusher from the project, or
+  upgrade to a plan with more pusher slots.
+- **`projects`** — delete an unused project, or upgrade.
+
+## `403` (no `entitlement` field)
+
+The token is valid but isn't scoped to the project you're trying
+to publish to. Tokens are project-scoped at issue time. Mint a
+new token from the right project's settings.
+
+## `404 NotFound`
+
+The project doesn't exist or your token doesn't have visibility
+into it. Confirm the `--project` value matches the project name
+in the dashboard exactly (case-sensitive).
+
+## `422 ValidationError`
+
+The `--data` payload doesn't match the event type's JSON Schema.
+The response body lists the offending fields:
+
+```json
+{
+  "error": "ValidationError",
+  "details": [
+    { "path": "/taskId", "message": "Required" }
+  ]
+}
+```
+
+PATCH validation errors have no `details` array — only `{"error":
+"ValidationError"}`. The asymmetry is intentional; sparse PATCH
+requests don't always produce meaningful per-field errors.
+
+**Check the payload locally before sending:**
+
+```bash
+no-tickets validate \
+  --type ai.task.completed.v1 \
+  --data '{"taskId":"…","outcome":"success"}'
+```
+
+`validate` runs the same JSON Schema check with no network call,
+so iterating is fast.
+
+## `429 RateLimited`
+
+The token has exceeded its per-minute write quota (60 req/min by
+default). Limits apply to the token, not the endpoint.
+
+**Recovery:**
+
+- Back off and retry. Most clients should use exponential backoff
+  starting at 1s.
+- For high-volume publish workloads, switch to batch mode:
+  `no-tickets publish --file events.jsonl` sends a JSONL batch in
+  one request instead of one HTTP call per event.
+
+## `5xx` server errors
+
+Transient. The CLI does not auto-retry; wire retries into your
+calling code or CI step. Check the
+[Status page](https://app.no-tickets.com) for any ongoing
+incident before opening a bug.
+
+## CLI failure modes (no HTTP call made)
+
+Some errors happen before the request leaves your machine:
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| `unrecognized subcommand 'self-update'` | You're on v0.1.3+; the subcommand was renamed | Use `no-tickets update` |
+| `no-tickets: command not found` after install | `~/.local/bin` not on `PATH` | See [Install — verify](/getting-started/install#verify-the-install) |
+| Binary refuses to execute on Linux container | Image is `distroless/base` (no libc resolution at runtime) | Switch to `distroless/static` or Alpine — see [Install — supported platforms](/getting-started/install#supported-platforms) |
+| `no-tickets self-update` left a corrupt binary | v0.1.2 known-bad updater | Re-run the curl installer — see [Install — updating](/getting-started/install#updating) |
+
+## See also
+
+- [Troubleshooting overview](/troubleshooting/overview) — triage flow
+- [REST API reference](/api-reference/overview) — full error envelope shapes
+- [Install guide](/getting-started/install) — platform-specific gotchas

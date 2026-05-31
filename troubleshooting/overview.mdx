@@ -1,6 +1,54 @@
 ---
 title: "Troubleshooting"
-description: "Common errors and how to resolve them."
+description: "Where to look first when something goes wrong."
 ---
 
-<Info>Placeholder — content lands as the CLI / API error catalog matures.</Info>
+This section catalogs the errors you're most likely to hit, what
+they mean, and how to recover. If you're not sure where to start,
+work the list below from top to bottom — most issues fall out by
+step 2 or 3.
+
+## Quick triage
+
+1. **Run `no-tickets status`.** It prints your auth state and
+   locally-registered tokens as JSON. If `tokens` is empty or
+   missing your project, you need to re-register (see
+   [Your first push, step 3](/getting-started/first-push#3-register-the-token-locally)).
+2. **Re-run with `--verbose` if available.** Many CLI commands
+   accept it; the extra output usually points straight at the
+   failing step.
+3. **Validate the payload locally.** For publish errors,
+   [`no-tickets validate --type <type> --data '<json>'`](/cli-reference/commands/validate)
+   runs the same JSON Schema check the server does, without a
+   network call.
+4. **Check the HTTP status the API returned.** The CLI surfaces it
+   in error output. Cross-reference against [Common
+   errors](/troubleshooting/common-errors) for the canonical
+   meaning and recovery steps.
+5. **Confirm the binary is current.** `no-tickets update` will tell
+   you whether you're behind a release; some failures are fixed by
+   bumping past a known bad version (notably the v0.1.2 self-update
+   bug — see the [install
+   guide](/getting-started/install#updating)).
+
+## When to escalate
+
+If the steps above don't surface the cause:
+
+- **Reproduce with `--dry-run` where the command supports it** to
+  isolate "the CLI built the request wrong" from "the server
+  rejected it."
+- **Check the [Status page](https://app.no-tickets.com)** for any
+  ongoing incidents on the API.
+- **Open an issue** at
+  [`magic-ingredients/no-tickets`](https://github.com/magic-ingredients/no-tickets/issues)
+  for CLI bugs, or
+  [`magic-ingredients/no-tickets-service`](https://github.com/magic-ingredients/no-tickets-service/issues)
+  for server-side issues. Include the CLI version
+  (`no-tickets --version`), the exact command you ran, and the
+  full error output.
+
+## In this section
+
+- [Common errors](/troubleshooting/common-errors) — full catalog of
+  HTTP error codes and CLI failure modes, with recovery steps.
